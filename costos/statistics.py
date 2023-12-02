@@ -304,3 +304,4 @@ def get_product_cronograma(request, product_code):
         "series": series,
         "categories": categories
     }, safe=False)
+
