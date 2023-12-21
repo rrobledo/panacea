@@ -6,7 +6,7 @@ from rest_framework import serializers
 class SupplySerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Supplies
-        fields = ["code", "name", "measure", "price"]
+        fields = ["id", "code", "name", "measure", "price"]
 
 
 class ProductSerializer(serializers.HyperlinkedModelSerializer):
@@ -18,7 +18,7 @@ class ProductSerializer(serializers.HyperlinkedModelSerializer):
 class CostSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Costs
-        fields = ["code", "product_code", "revenue", "current_price", "units"]
+        fields = ["id", "code", "product_code", "revenue", "current_price", "units"]
 
 
 class CostsDetailsSerializer(serializers.HyperlinkedModelSerializer):

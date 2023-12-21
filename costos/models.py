@@ -7,6 +7,10 @@ class Supplies(models.Model):
     measure = models.FloatField()
     price = models.FloatField()
 
+    @property
+    def id(self):
+        return f"{self.code}/"
+
 
 class Products(models.Model):
     code = models.CharField(max_length=50, primary_key=True)
@@ -19,6 +23,10 @@ class Costs(models.Model):
     revenue = models.FloatField()
     current_price = models.FloatField()
     units = models.IntegerField()
+
+    @property
+    def id(self):
+        return f"{self.code}/"
 
 
 class CostsDetails(models.Model):

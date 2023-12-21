@@ -5,7 +5,7 @@ from rest_framework import viewsets
 
 # ViewSets define the view behavior.
 class SuppliesViewSet(viewsets.ModelViewSet):
-    queryset = Supplies.objects.all()
+    queryset = Supplies.objects.order_by("name").all()
     serializer_class = SupplySerializer
 
 
