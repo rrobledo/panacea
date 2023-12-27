@@ -43,7 +43,7 @@ def get_cost_by_product(request, product_code):
 def get_all_cost(request):
     costs = Costs.objects.all()
     prices = []
-    for cost in costs:
+    for cost in costs[:1]:
         if cost.units > 1:
             ret = get_cost_by_product(request, cost.product_code)
             prod_cost = json.loads(ret.content)
@@ -56,7 +56,7 @@ def get_all_cost(request):
                 "cost_total": prod_cost.get("cost_total"),
                 "sale_total": prod_cost.get("sale_total")
             })
-    return JsonResponse(prices)
+    return JsonResponse(prices, safe=False)
 
 def get_product_history(request, product_code):
     def dictfetchall(cursor):
