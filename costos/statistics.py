@@ -43,7 +43,7 @@ def get_cost_by_product(request, product_code):
 def get_all_cost(request):
     costs = Costs.objects.all()
     prices = []
-    for cost in costs[:1]:
+    for cost in costs:
         if cost.units > 1:
             ret = get_cost_by_product(request, cost.product_code)
             prod_cost = json.loads(ret.content)
