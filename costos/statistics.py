@@ -56,7 +56,7 @@ def get_all_cost(request):
                 "cost_total": prod_cost.get("cost_total"),
                 "sale_total": prod_cost.get("sale_total")
             })
-    return prices
+    return JsonResponse(prices)
 
 def get_product_history(request, product_code):
     def dictfetchall(cursor):
