@@ -5,6 +5,7 @@ class Supplies(models.Model):
     code = models.CharField(max_length=50, primary_key=True)
     name = models.CharField(max_length=250)
     measure = models.FloatField()
+    measure_units = models.CharField(max_length=10, default="GR")
     price = models.FloatField()
 
     @property
@@ -23,6 +24,8 @@ class Costs(models.Model):
     revenue = models.FloatField()
     current_price = models.FloatField()
     units = models.IntegerField()
+    measure_units = models.CharField(max_length=10, default="GR")
+    production_time = models.IntegerField(default=0)
 
     @property
     def id(self):
