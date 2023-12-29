@@ -16,6 +16,7 @@ class Supplies(models.Model):
 class Products(models.Model):
     code = models.CharField(max_length=50, primary_key=True)
     name = models.CharField(max_length=250)
+    ref_id = models.CharField(max_length=250, null=True)
 
 
 class Costs(models.Model):

@@ -12,7 +12,7 @@ class SupplySerializer(serializers.HyperlinkedModelSerializer):
 class ProductSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Products
-        fields = ['code', 'name']
+        fields = ['code', 'name', 'ref_id']
 
 
 class CostSerializer(serializers.HyperlinkedModelSerializer):
