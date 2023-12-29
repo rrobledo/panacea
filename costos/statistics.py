@@ -56,6 +56,7 @@ def get_all_cost(request):
                 "cost_total": prod_cost.get("cost_total"),
                 "sale_total": prod_cost.get("sale_total")
             })
+    prices = sorted(prices, key=lambda x: x.get("product_name"))
     return JsonResponse(prices, safe=False)
 
 def get_product_history(request, product_code):
