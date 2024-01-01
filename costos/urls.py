@@ -21,7 +21,7 @@ router.register(r'products', views.ProductsViewSet)
 router.register(r'productos', views.ProductsViewSet)
 router.register(r'costs', views.CostsViewSet)
 router.register(r'costos', views.CostsViewSet)
-router.register(r'costs_details', views.CostsDetailsViewSet)
+router.register(r'costs_details', views.CostsDetailsViewSet, basename='CostsDetailsViewSet')
 
 urlpatterns = [
     path('', include(router.urls)),

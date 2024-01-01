@@ -20,6 +20,15 @@ class CostsViewSet(viewsets.ModelViewSet):
 
 
 class CostsDetailsViewSet(viewsets.ModelViewSet):
-    queryset = CostsDetails.objects.all()
     serializer_class = CostsDetailsSerializer
 
+    def get_queryset(self):
+        """
+        Optionally restricts the returned purchases to a given user,
+        by filtering against a `username` query parameter in the URL.
+        """
+        queryset = CostsDetails.objects.all()
+        code_cost = self.request.query_params.get('cost_code')
+        if code_cost is not None:
+            queryset = queryset.filter(cost_code=code_cost)
+        return queryset
