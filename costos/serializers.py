@@ -23,7 +23,7 @@ class CostSerializer(serializers.HyperlinkedModelSerializer):
 
 class CostsDetailsSerializer(serializers.HyperlinkedModelSerializer):
     supply_name = serializers.CharField(source='supply_code.name')
-    supply_measure_units = serializers.CharField(source='supply_code.supply_measure_units')
+    supply_measure_units = serializers.CharField(source='supply_code.measure_units')
 
     class Meta:
         model = CostsDetails
