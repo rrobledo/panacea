@@ -31,6 +31,7 @@ def get_cost_by_product(request, product_code):
         "revenue": revenue,
         "suggested_price": suggested_price,
         "current_price": current_price,
+        "production_time": cost.production_time,
         "current_revenue": current_revenue,
         "current_sale_total": round(current_price * units, 2),
         "cost_total": round(sum_cost, 2),
@@ -52,9 +53,12 @@ def get_all_cost(request):
                 "product_code": cost.product_code.code,
                 "product_name": prod_cost.get("product_name"),
                 "units": prod_cost.get("units"),
+                "current_price": prod_cost.get("current_price"),
                 "suggested_price": prod_cost.get("suggested_price"),
                 "cost_total": prod_cost.get("cost_total"),
-                "sale_total": prod_cost.get("sale_total")
+                "sale_total": prod_cost.get("sale_total"),
+                "revenue": round(1 - (prod_cost.get("current_price") / prod_cost.get("suggested_price")) * 100, 2),
+                "production_time": prod_cost.get("production_time"),
             })
     prices = sorted(prices, key=lambda x: x.get("product_name"))
     return JsonResponse(prices, safe=False)
