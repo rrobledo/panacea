@@ -15,14 +15,14 @@ def get_cost_by_product(request, product_code):
         }
 
     cost = Costs.objects.get(product_code=product_code)
-    data = CostsDetails.objects.filter(cost_code__code=cost.code).all()
+    cost_detail = CostsDetails.objects.filter(cost_code__code=cost.code).all()
 
     recipe_count = int(request.GET.get("recipe_count", None)) if request.GET.get("recipe_count", None) else 1
     units = (int(request.GET.get("units", None)) if request.GET.get("units", None) else cost.units) * recipe_count
     revenue = float(request.GET.get("revenue", None)) if request.GET.get("revenue", None) else cost.revenue
     current_price = float(request.GET.get("current_price", None)) if request.GET.get("current_price", None) else cost.current_price
 
-    sum_cost = sum([d.supply_code.price / d.supply_code.measure * d.amount * (recipe_count if d.type == 'V' else 1) for d in data])
+    sum_cost = sum([d.supply_code.price / d.supply_code.measure * d.amount * (recipe_count if d.type == 'V' else 1) for d in cost_detail])
     suggested_price = round(sum_cost / units * ((revenue / 100) + 1), 2)
     current_revenue = round(((current_price / sum_cost * units) - 1) * 100, 2)
     response = {
@@ -36,7 +36,7 @@ def get_cost_by_product(request, product_code):
         "current_sale_total": round(current_price * units, 2),
         "cost_total": round(sum_cost, 2),
         "sale_total": round(suggested_price * units, 2),
-        "cost_detail": [gen_costs(d, recipe_count, sum_cost) for d in data]
+        "cost_detail": sorted([gen_costs(d, recipe_count, sum_cost) for d in cost_detail], key=lambda x: x.get("percentage_over_cost"), reverse=True)
     }
     return JsonResponse(response)
 
