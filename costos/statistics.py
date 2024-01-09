@@ -57,7 +57,7 @@ def get_all_cost(request):
                 "suggested_price": prod_cost.get("suggested_price"),
                 "cost_total": prod_cost.get("cost_total"),
                 "sale_total": prod_cost.get("sale_total"),
-                "revenue": round((1 - (prod_cost.get("current_price") / prod_cost.get("suggested_price"))) * 100, 2),
+                "revenue": round(((prod_cost.get("current_price") / prod_cost.get("suggested_price")) - 1) * 100, 2),
                 "production_time": prod_cost.get("production_time"),
             })
     prices = sorted(prices, key=lambda x: x.get("product_name"))
