@@ -390,7 +390,8 @@ def get_planning(request):
          where month = 'Enero')
         select *
           from subtotal
-         where month = 'Enero';
+         where month = 'Enero'
+         order by product_name;
     """
     with connection.cursor() as cursor:
         cursor.execute(sql_planning)
