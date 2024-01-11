@@ -177,13 +177,6 @@ def get_product_history(request, product_code):
 
 
 def get_product_cronograma(request, product_code):
-    def dictfetchall(cursor):
-        """
-        Return all rows from a cursor as a dict.
-        Assume the column names are unique.
-        """
-        columns = [col[0] for col in cursor.description]
-        return [dict(zip(columns, row)) for row in cursor.fetchall()]
 
     sql_with_sales = """
         with sales as (select c.nombre as article,
@@ -246,15 +239,15 @@ def get_product_cronograma(request, product_code):
 
     with connection.cursor() as cursor:
         cursor.execute(sql_products)
-        products = dictfetchall(cursor)
+        products = _dictfetchall(cursor)
 
     with connection.cursor() as cursor:
         cursor.execute(sql_months)
-        months = dictfetchall(cursor)
+        months = _dictfetchall(cursor)
 
     with connection.cursor() as cursor:
         cursor.execute(sql_data)
-        data = dictfetchall(cursor)
+        data = _dictfetchall(cursor)
 
     items = zip(products, months)
 
@@ -308,3 +301,121 @@ def get_product_cronograma(request, product_code):
         "categories": categories
     }, safe=False)
 
+
+def get_planning(request):
+
+    sql_planning = """
+        with sales as (select a.idarticulo as product_id, c.nombre as article,
+               case 
+                   when a.nombre in ('Facturas', 'Facturas x2', 'Medialunas', 'Medialunas x2') then 'Facturas-Medialunas' 
+                   else a.nombre 
+               end as product,
+               case 
+                   when d.idcliente = 0 then 'Local'
+                   else 'Dietetica'
+               end as lugar_venta,
+               concat(
+                date_part('year', d.fechadocumento),
+                '-',
+                to_char(date_part('month', d.fechadocumento), 'fm00'),
+                case
+                    when date_part('month', d.fechadocumento) = 1 then 'Ene'
+                    when date_part('month', d.fechadocumento) = 2 then 'Feb'
+                    when date_part('month', d.fechadocumento) = 3 then 'Mar'
+                    when date_part('month', d.fechadocumento) = 4 then 'Abr'
+                    when date_part('month', d.fechadocumento) = 5 then 'May'
+                    when date_part('month', d.fechadocumento) = 6 then 'Jun'
+                    when date_part('month', d.fechadocumento) = 7 then 'Jul'
+                    when date_part('month', d.fechadocumento) = 8 then 'Ago'
+                    when date_part('month', d.fechadocumento) = 9 then 'Sep'
+                    when date_part('month', d.fechadocumento) = 10 then 'Oct'
+                    when date_part('month', d.fechadocumento) = 11 then 'Nov'
+                    when date_part('month', d.fechadocumento) = 12 then 'Dic'
+                end
+               ) as month_of_year,
+               concat(
+                date_part('year', d.fechadocumento),
+                to_char(date_part('week', d.fechadocumento), 'fm00'),
+                to_char(date_part('month', d.fechadocumento), 'fm00')
+               ) as week_of_year_old,
+               to_char(d.fechadocumento, 'YYYY-MM-DD') as operation_data,
+               case 
+                when a.nombre like '%x2%' then 2
+                when a.nombre like '%x3%' then 3
+                else 1
+               end * dd.cantidad as total,
+               dd.subtotal
+          from documentos d 
+            join documentosdetalles dd
+              on d.iddocumento = dd.iddocumento 
+            join articulos a 
+              on dd.idarticulo = a.idarticulo 
+            join categorias c
+              on a.idcategoria = c.idcategoria),
+        planning as (
+        select p.codigo as product_id, 
+               p.productos as product_name, 
+               unnest(array['2024','2024','2024','2024','2024','2024','2024','2024','2024','2024','2024','2024']) as year,
+               unnest(array['Enero', 'Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre']) as month,
+               unnest(array[jan2024, feb2024,mar2024,apr2024,may2024,jun2024,jul2024,aug2024,sep2024,oct2024,nov2024,dec2024]) as total
+          from planificacion2024 p 
+         where p.productos not in ('Total unidades')),
+        total as (
+        select p.product_id,
+                cp.code as product_code,
+                p.product_name, 
+                year, 
+                month, 
+                total, 
+                a.preciopublico as precio, 
+                total * a.preciopublico as total_venta
+          from planning p
+            left outer join articulos a 
+              on p.product_id = a.idarticulo
+            left outer join costos_products cp 
+              on cp.ref_id::int = p.product_id),
+        subtotal as (
+              select *,
+         (select sum(total)
+          from sales
+         where month_of_year = '2024-01Ene'
+           and product_id = total.product_id
+         ) total_actual,
+         (select sum(total)
+          from sales
+         where month_of_year = '2024-01Ene'
+           and product_id = total.product_id
+         ) * precio as total_venta_actual
+          from total
+         where month = 'Enero')
+        select *
+          from subtotal
+         where month = 'Enero';
+    """
+    with connection.cursor() as cursor:
+        cursor.execute(sql_planning)
+        planning = _dictfetchall(cursor)
+
+    result = []
+    for prod in planning:
+        try:
+            if prod.get("product_code"):
+                ret = get_cost_by_product(request, prod.get("product_code"))
+                prod_cost = json.loads(ret.content)
+                prod["costo_producto"] = prod_cost.get("suggested_price")
+                prod["ganancia"] = round(((prod_cost["current_price"] / prod_cost.get("suggested_price")) - 1) * 100, 2)
+            pass
+        finally:
+            pass
+
+    return JsonResponse(planning, safe=False)
+
+
+
+def _dictfetchall(cursor):
+    """
+    Return all rows from a cursor as a dict.
+    Assume the column names are unique.
+    """
+    columns = [col[0] for col in cursor.description]
+    return [dict(zip(columns, row)) for row in cursor.fetchall()]
