@@ -411,7 +411,7 @@ def get_planning(request):
                 prod["total_venta_planeado"] = prod.get("precio", 0) * prod.get("total", 0)
                 prod["total_venta_actual"] = prod.get("precio", 0) * prod.get("total_actual", 0)
                 prod["ganancia_planeado"] = prod["total_venta_planeado"] - prod["costo_total_planeado"]
-                prod["ganancia_actual"] = prod["total_venta_actual"] - prod["costo_total_planeado"]
+                prod["ganancia_actual"] = prod["total_venta_actual"] - prod["costo_total_actual"]
                 prod["porcentaje_ganancia_prod"] = round((prod.get("precio", 0) / prod.get("costo_producto", 1) - 1) * 100, 2)
             pass
         finally:
