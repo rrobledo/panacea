@@ -397,7 +397,7 @@ def get_planning(request):
         planning = _dictfetchall(cursor)
 
     result = []
-    for prod in planning:
+    for prod in planning[:2]:
         try:
             if prod.get("product_code"):
                 ret = get_cost_by_product(request, prod.get("product_code"))
@@ -407,6 +407,22 @@ def get_planning(request):
             pass
         finally:
             pass
+
+    planning.append(
+        {
+            "product_id": 0,
+            "product_code": "TOTALES",
+            "product_name": "TOTALES",
+            "year": "2024",
+            "month": "Enero",
+            "total": sum([d.get("total", 0) for d in planning]),
+            "precio": 0,
+            "total_venta": sum([d.get("total_venta", 0) if d.get("total_venta") != '' and d.get("total_venta") is not None else 0 for d in planning]),
+            "total_actual": sum([d.get("total_actual", 0) if d.get("total_actual") != '' and d.get("total_actual") is not None else 0 for d in planning]),
+            "total_venta_actual": sum([d.get("total_venta_actual", 0) if d.get("total_venta_actual") != '' and d.get("total_venta_actual") is not None else 0 for d in planning]),
+            "costo_producto": sum([d.get("costo_producto", 0) if d.get("costo_producto") != '' and d.get("costo_producto") is not None else 0 for d in planning]),
+            "ganancia": sum([d.get("ganancia") if d.get("ganancia") != '' and d.get("ganancia") is not None else 0 for d in planning]) / sum([1 if d.get("ganancia") != '' and d.get("ganancia") is not None else 0 for d in planning]),
+        })
 
     return JsonResponse(planning, safe=False)
 
