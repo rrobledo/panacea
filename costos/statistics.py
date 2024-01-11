@@ -403,7 +403,7 @@ def get_planning(request):
                 ret = get_cost_by_product(request, prod.get("product_code"))
                 prod_cost = json.loads(ret.content)
                 prod.pop("total_venta")
-                prod["precio"] = float(prod.get("precio", 0)) * 0.80,
+                prod["precio"] = round(float(prod.get("precio", 0)) * 0.80, 0),
                 prod["total_actual"] = prod["total_actual"] if prod["total_actual"] is not None else 0
                 prod["costo_producto"] = prod_cost.get("suggested_price")
                 prod["costo_total_planeado"] = prod.get("costo_producto") * prod.get("total")
