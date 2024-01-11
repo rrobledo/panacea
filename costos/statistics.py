@@ -406,12 +406,12 @@ def get_planning(request):
                 prod["precio"] = prod_cost.get("current_price")
                 prod["costo_producto"] = prod_cost.get("suggested_price")
                 prod["costo_total_planeado"] = prod.get("costo_producto") * prod.get("total")
-                prod["costo_total_actual"] = prod.get("costo_producto") * prod.get("total_actual")
-                prod["total_venta_planeado"] = prod.get("precio") * prod.get("total")
-                prod["total_venta_actual"] = prod.get("precio") * prod.get("total_actual")
+                prod["costo_total_actual"] = prod.get("costo_producto", 0) * prod.get("total_actual", 0)
+                prod["total_venta_planeado"] = prod.get("precio", 0) * prod.get("total", 0)
+                prod["total_venta_actual"] = prod.get("precio", 0) * prod.get("total_actual", 0)
                 prod["ganancia_planeado"] = prod["total_venta_planeado"] - prod["costo_total_planeado"]
                 prod["ganancia_actual"] = prod["total_venta_actual"] - prod["costo_total_planeado"]
-                prod["porcentaje_ganancia_prod"] = round(((prod["precio"] / prod["costo_producto"]) - 1) * 100, 2)
+                prod["porcentaje_ganancia_prod"] = round((prod.get("precio", 0) / prod.get("costo_producto", 1) - 1) * 100, 2)
             pass
         finally:
             pass
