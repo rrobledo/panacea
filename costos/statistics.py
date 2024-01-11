@@ -397,13 +397,13 @@ def get_planning(request):
         cursor.execute(sql_planning)
         planning = _dictfetchall(cursor)
 
-    for prod in planning:
+    for prod in planning[:1]:
         try:
             if prod.get("product_code"):
                 ret = get_cost_by_product(request, prod.get("product_code"))
                 prod_cost = json.loads(ret.content)
                 prod.pop("total_venta")
-                prod["precio"] = round(float(prod["precio"] if prod["precio"] is not None else 0) * 0.80, 0),
+                prod["precio"] = round(float(prod["precio"] if prod["precio"] is not None else 0) * 0.80, 0)
                 prod["total_actual"] = prod["total_actual"] if prod["total_actual"] is not None else 0
                 prod["costo_producto"] = prod_cost.get("suggested_price")
                 prod["costo_total_planeado"] = prod.get("costo_producto") * prod.get("total")
