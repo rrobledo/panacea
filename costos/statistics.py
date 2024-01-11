@@ -445,7 +445,7 @@ def get_planning(request):
                 "total_venta_actual") != '' and d.get("total_venta_actual") is not None else 0 for d in planning]))
             - float(sum([d.get("costo_total_actual", 0) if d.get(
                 "costo_total_actual") != '' and d.get("costo_total_actual") is not None else 0 for d in planning])),
-            "porcentaje_ganancia_prod": float(sum([d.get("costo_producto", 0) if d.get("costo_producto") != '' and d.get("costo_producto") is not None else 0 for d in planning])),
+            "porcentaje_ganancia_prod": 0,
         })
 
     return JsonResponse(planning, safe=False)
