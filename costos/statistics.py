@@ -417,6 +417,16 @@ def get_planning(request):
         finally:
             pass
 
+    total: sum([int(d.get("total", 0)) for d in planning])
+    total_actual = sum([int(d.get("total_actual", 0)) if d.get("total_actual") != '' and d.get("total_actual") is not None else 0 for d in planning])
+    total_venta_planeado = round(sum([float(d.get("total_venta_planeado", 0)) if d.get("total_venta_planeado") != '' and d.get("total_venta_planeado") is not None else 0 for d in planning]), 2)
+    total_venta_actual = round(sum([float(d.get("total_venta_actual", 0)) if d.get("total_venta_actual") != '' and d.get("total_venta_actual") is not None else 0 for d in planning]), 2)
+    costo_total_planeado = round(sum([float(d.get("costo_total_planeado", 0)) if d.get("costo_total_planeado") != '' and d.get("costo_total_planeado") is not None else 0 for d in planning]), 2)
+    costo_total_actual = round(sum([float(d.get("costo_total_actual", 0)) if d.get("costo_total_actual") != '' and d.get("costo_total_actual") is not None else 0 for d in planning]), 2)
+    ganancia_planeado = total_venta_planeado - costo_total_planeado
+    ganancia_actual = total_venta_actual - costo_total_actual
+    porcentaje_ganancia_prod = round(sum([float(d.get("porcentaje_ganancia_prod", 0)) if d.get("porcentaje_ganancia_prod") != '' and d.get("porcentaje_ganancia_prod") is not None else 0 for d in planning]) / sum([1 if d.get("porcentaje_ganancia_prod") != '' and d.get("porcentaje_ganancia_prod") is not None else 0 for d in planning]), 2)
+
     planning.append(
         {
             "product_id": 0,
@@ -424,29 +434,17 @@ def get_planning(request):
             "product_name": "TOTALES",
             "year": "2024",
             "month": "Enero",
-            "total": float(sum([d.get("total", 0) for d in planning])),
+            "total": total,
             "precio": 0,
-            "total_actual": float(sum([d.get("total_actual", 0) if d.get("total_actual") != '' and d.get(
-                "total_actual") is not None else 0 for d in planning])),
-            "total_venta_actual": float(sum([d.get("total_venta_actual", 0) if d.get(
-                "total_venta_actual") != '' and d.get("total_venta_actual") is not None else 0 for d in planning])),
+            "total_actual": total_actual,
+            "total_venta_actual": total_venta_actual,
+            "total_venta_planeado": total_venta_planeado,
             "costo_producto": 0,
-            "costo_total_planeado": float(sum([d.get("costo_total_planeado", 0) if d.get(
-                "costo_total_planeado") != '' and d.get("costo_total_planeado") is not None else 0 for d in planning])),
-            "costo_total_actual": float(sum([d.get("costo_total_actual", 0) if d.get(
-                "costo_total_actual") != '' and d.get("costo_total_actual") is not None else 0 for d in planning])),
-            "total_venta_planeado": float(sum([d.get("total_venta_planeado", 0) if d.get(
-                "total_venta_planeado") != '' and d.get("total_venta_planeado") is not None else 0 for d in planning])),
-            "ganancia_planeado": float(sum([d.get("total_venta_planeado", 0) if d.get(
-                "total_venta_planeado") != '' and d.get("total_venta_planeado") is not None else 0 for d in planning]))
-            - float(sum([d.get("costo_total_planeado", 0) if d.get(
-                "costo_total_planeado") != '' and d.get("costo_total_planeado") is not None else 0 for d in planning])),
-            "ganancia_actual": float(sum([d.get("total_venta_actual", 0) if d.get(
-                "total_venta_actual") != '' and d.get("total_venta_actual") is not None else 0 for d in planning]))
-            - float(sum([d.get("costo_total_actual", 0) if d.get(
-                "costo_total_actual") != '' and d.get("costo_total_actual") is not None else 0 for d in planning])),
-            "porcentaje_ganancia_prod": float(sum([d.get("porcentaje_ganancia_prod", 0) if d.get("porcentaje_ganancia_prod") != '' and d.get("porcentaje_ganancia_prod") is not None else 0 for d in planning]))
-            / float(sum([1 if d.get("porcentaje_ganancia_prod") != '' and d.get("porcentaje_ganancia_prod") is not None else 0 for d in planning])),
+            "costo_total_planeado": costo_total_planeado,
+            "costo_total_actual": costo_total_actual,
+            "ganancia_planeado": ganancia_planeado,
+            "ganancia_actual": ganancia_actual,
+            "porcentaje_ganancia_prod": porcentaje_ganancia_prod,
         })
 
     return JsonResponse(planning, safe=False)
