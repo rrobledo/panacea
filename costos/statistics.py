@@ -417,7 +417,7 @@ def get_planning(request):
         finally:
             pass
 
-    total: sum([int(d.get("total", 0)) for d in planning])
+    total = sum([int(d.get("total", 0)) for d in planning])
     total_actual = sum([int(d.get("total_actual", 0)) if d.get("total_actual") != '' and d.get("total_actual") is not None else 0 for d in planning])
     total_venta_planeado = round(sum([float(d.get("total_venta_planeado", 0)) if d.get("total_venta_planeado") != '' and d.get("total_venta_planeado") is not None else 0 for d in planning]), 2)
     total_venta_actual = round(sum([float(d.get("total_venta_actual", 0)) if d.get("total_venta_actual") != '' and d.get("total_venta_actual") is not None else 0 for d in planning]), 2)
