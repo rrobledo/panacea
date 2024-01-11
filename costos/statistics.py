@@ -397,7 +397,7 @@ def get_planning(request):
         cursor.execute(sql_planning)
         planning = _dictfetchall(cursor)
 
-    for prod in planning[:1]:
+    for prod in planning:
         try:
             if prod.get("product_code"):
                 ret = get_cost_by_product(request, prod.get("product_code"))
