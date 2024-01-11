@@ -31,5 +31,5 @@ urlpatterns = [
     path('products/<str:product_code>/cost', statistics.get_cost_by_product, name='get_cost_by_product'),
     path('products/<str:product_code>/history', statistics.get_product_history, name='get_product_history'),
     path('products/<str:product_code>/cronograma', statistics.get_product_cronograma, name='get_product_cronograma'),
-    path('reports/planning', statistics.get_planning, name='get_planning'),
+    path('planning', statistics.get_planning, name='get_planning'),
 ]
