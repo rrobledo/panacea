@@ -366,9 +366,25 @@ def get_planning(request):
                 p.product_name, 
                 year, 
                 month, 
-                total, 
-                a.preciopublico as precio, 
-                total * a.preciopublico as total_venta
+                total,
+                case 
+                    when a.noaplicardescuento = 1
+                        then case
+                                when p.product_name like '%100gr%'
+                                    then a.ubicacion::int / 100
+                                else a.ubicacion::int
+                        end
+                    else a.preciopublico
+                end as precio, 
+                total * case 
+                    when a.noaplicardescuento = 1
+                        then case
+                                when p.product_name like '%100gr%'
+                                    then a.ubicacion::int / 100
+                                else a.ubicacion::int
+                        end
+                    else a.preciopublico
+                end as total_venta
           from planning p
             left outer join articulos a 
               on p.product_id = a.idarticulo
@@ -391,7 +407,7 @@ def get_planning(request):
         select *
           from subtotal
          where month = 'Enero'
-         order by product_name;
+         order by product_name    
     """
     with connection.cursor() as cursor:
         cursor.execute(sql_planning)
