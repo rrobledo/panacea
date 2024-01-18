@@ -503,7 +503,6 @@ def get_planning(request):
     return JsonResponse(planning, safe=False)
 
 
-
 def _dictfetchall(cursor):
     """
     Return all rows from a cursor as a dict.
