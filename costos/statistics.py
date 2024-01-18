@@ -385,7 +385,7 @@ def get_planning(request):
                     when a.noaplicardescuento = 1
                         then case
                                 when p.product_name like '%100gr%'
-                                    then a.ubicacion::int / 100
+                                    then a.ubicacion::int / 10
                                 else a.ubicacion::int
                         end
                     else a.preciopublico
@@ -394,7 +394,7 @@ def get_planning(request):
                     when a.noaplicardescuento = 1
                         then case
                                 when p.product_name like '%100gr%'
-                                    then a.ubicacion::int / 100
+                                    then a.ubicacion::int / 10
                                 else a.ubicacion::int
                         end
                     else a.preciopublico
