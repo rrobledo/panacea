@@ -1,5 +1,5 @@
-from .models import Supplies, Products, Costs, CostsDetails
-from .serializers import SupplySerializer, ProductSerializer, CostSerializer, CostsDetailsSerializer
+from .models import Supplies, Products, Costs, CostsDetails, Compras
+from .serializers import SupplySerializer, ProductSerializer, CostSerializer, CostsDetailsSerializer, ComprasSerializer
 from rest_framework import viewsets
 
 
@@ -32,3 +32,8 @@ class CostsDetailsViewSet(viewsets.ModelViewSet):
         if code_cost is not None:
             queryset = queryset.filter(cost_code=code_cost)
         return queryset
+
+
+class ComprasViewSet(viewsets.ModelViewSet):
+    queryset = Compras.objects.all()
+    serializer_class = ComprasSerializer

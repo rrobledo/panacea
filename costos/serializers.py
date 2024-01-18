@@ -28,3 +28,9 @@ class CostsDetailsSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = CostsDetails
         fields = ["cost_code", "supply_code", 'supply_name', "supply_measure_units", "amount", "type"]
+
+
+class ComprasSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = Costs
+        fields = ["id", "data", "ticket_number", "provider", "notes", "amount"]

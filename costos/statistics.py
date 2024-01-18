@@ -1,6 +1,7 @@
 from django.db import connection
 from django.http import JsonResponse
 from .models import Costs, CostsDetails
+from vercel_app.settings import COSTO_UNITARIO_PRODUCCION
 import json
 
 
@@ -24,18 +25,25 @@ def get_cost_by_product(request, product_code):
 
     sum_cost = sum([d.supply_code.price / d.supply_code.measure * d.amount * (recipe_count if d.type == 'V' else 1) for d in cost_detail])
     suggested_price = round(sum_cost / units * ((revenue / 100) + 1), 2)
+    costo_unitario_mp = round(sum_cost / units, 2)
     current_revenue = round(((current_price / sum_cost * units) - 1) * 100, 2)
     response = {
         "product_name": cost.product_code.name,
         "units": units,
         "revenue": revenue,
-        "suggested_price": suggested_price,
+        "suggested_price": round(suggested_price + (COSTO_UNITARIO_PRODUCCION * cost.production_time / units), 2),
+        "costo_unitario_mp": costo_unitario_mp,
+        "costo_mp": round(costo_unitario_mp * units, 2),
+        "costo_unitario_produccion": COSTO_UNITARIO_PRODUCCION,
+        "costo_produccion": round(COSTO_UNITARIO_PRODUCCION * cost.production_time, 2),
         "current_price": current_price,
         "production_time": cost.production_time,
         "current_revenue": current_revenue,
+        "utilidad_del_lote": round((current_price * units) - (costo_unitario_mp * units) - (COSTO_UNITARIO_PRODUCCION * cost.production_time), 2),
         "current_sale_total": round(current_price * units, 2),
-        "cost_total": round(sum_cost, 2),
-        "sale_total": round(suggested_price * units, 2),
+        "costo_unitario_total": round(((costo_unitario_mp * units) + (COSTO_UNITARIO_PRODUCCION * cost.production_time)) / units, 2),
+        "costo_total": round((costo_unitario_mp * units) + (COSTO_UNITARIO_PRODUCCION * cost.production_time), 2),
+        "venta_total": round(current_price * units, 2),
         "cost_detail": sorted([gen_costs(d, recipe_count, sum_cost) for d in cost_detail], key=lambda x: x.get("percentage_over_cost"), reverse=True)
     }
     return JsonResponse(response)
@@ -54,11 +62,17 @@ def get_all_cost(request):
                 "product_name": prod_cost.get("product_name"),
                 "units": prod_cost.get("units"),
                 "current_price": prod_cost.get("current_price"),
+                "costo_unitario_mp": prod_cost.get("costo_unitario_mp"),
+                "costo_mp": prod_cost.get("costo_mp"),
+                "costo_unitario_produccion": prod_cost.get("costo_unitario_produccion"),
+                "costo_produccion": prod_cost.get("costo_produccion"),
                 "suggested_price": prod_cost.get("suggested_price"),
-                "cost_total": prod_cost.get("cost_total"),
-                "sale_total": prod_cost.get("sale_total"),
+                "costo_total": prod_cost.get("costo_total"),
+                "costo_unitario_total": prod_cost.get("costo_unitario_total"),
+                "venta_total": prod_cost.get("venta_total"),
                 "current_revenue": prod_cost.get("current_revenue"),
                 "production_time": prod_cost.get("production_time"),
+                "utilidad_del_lote": prod_cost.get("utilidad_del_lote"),
             })
     prices = sorted(prices, key=lambda x: x.get("product_name"))
     return JsonResponse(prices, safe=False)
@@ -209,7 +223,7 @@ def get_product_cronograma(request, product_code):
               on dd.idarticulo = a.idarticulo   
             join categorias c
               on a.idcategoria = c.idcategoria
-         where d.fechadocumento > CURRENT_DATE - INTERVAL '4 months'
+         where d.fechadocumento > CURRENT_DATE - INTERVAL '2 months'
            group by 1, 2, 4, 3)
     """
     sql_products = f"""
@@ -423,14 +437,19 @@ def get_planning(request):
                 ret = get_cost_by_product(request, prod.get("product_code"))
                 prod_cost = json.loads(ret.content)
                 prod["total_actual"] = prod["total_actual"] if prod["total_actual"] is not None else 0
-                prod["costo_producto"] = prod_cost.get("suggested_price")
-                prod["costo_total_planeado"] = prod.get("costo_producto") * prod.get("total")
-                prod["costo_total_actual"] = prod.get("costo_producto", 0) * prod.get("total_actual", 0)
+                prod["costo_unitario_mp"] = prod_cost.get("costo_unitario_mp")
+                prod["costo_mp"] = prod_cost.get("costo_mp")
+                prod["costo_unitario_produccion"] = prod_cost.get("costo_unitario_produccion")
+                prod["costo_produccion"] = prod_cost.get("costo_produccion")
+                prod["costo_total"] = prod_cost.get("costo_total")
+                prod["costo_unitario_total"] = prod_cost.get("costo_unitario_total")
+                prod["costo_total_planeado"] = prod.get("costo_unitario_total") * prod.get("total")
+                prod["costo_total_actual"] = prod.get("costo_unitario_total", 0) * prod.get("total_actual", 0)
                 prod["total_venta_planeado"] = prod.get("precio", 0) * prod.get("total", 0)
                 prod["total_venta_actual"] = prod.get("precio", 0) * prod.get("total_actual", 0)
                 prod["ganancia_planeado"] = prod["total_venta_planeado"] - prod["costo_total_planeado"]
                 prod["ganancia_actual"] = prod["total_venta_actual"] - prod["costo_total_actual"]
-                prod["porcentaje_ganancia_prod"] = round((prod.get("precio", 0) / prod.get("costo_producto", 1) - 1) * 100, 2)
+                prod["porcentaje_ganancia_prod"] = round((prod.get("precio", 0) / prod.get("costo_unitario_total", 1) - 1) * 100, 2)
             pass
         finally:
             pass

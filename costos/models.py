@@ -44,3 +44,12 @@ class CostsDetails(models.Model):
     amount = models.IntegerField()
     type = models.CharField(max_length=1, choices=COST_TYPES)
 
+
+class Compras(models.Model):
+    id = models.AutoField(primary_key=True)
+
+    date = models.DateField()
+    ticket_number = models.CharField(max_length=250)
+    provider = models.CharField(max_length=250)
+    notes = models.CharField(max_length=1000)
+    amount = models.FloatField()
