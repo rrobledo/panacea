@@ -35,7 +35,7 @@ def get_cost_by_product(request, product_code):
         "costo_unitario_mp": costo_unitario_mp,
         "costo_mp": round(costo_unitario_mp * units, 2),
         "costo_unitario_produccion": COSTO_UNITARIO_PRODUCCION,
-        "costo_produccion": round(COSTO_UNITARIO_PRODUCCION * cost.production_time, 2),
+        "costo_produccion": 0, # round(COSTO_UNITARIO_PRODUCCION * cost.production_time, 2),
         "current_price": current_price,
         "production_time": cost.production_time,
         "current_revenue": current_revenue,
