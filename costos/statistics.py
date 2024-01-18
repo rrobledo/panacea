@@ -1,7 +1,7 @@
 from django.db import connection
 from django.http import JsonResponse
 from .models import Costs, CostsDetails
-from vercel_app.settings import COSTO_UNITARIO_PRODUCCION
+from vercel_app.settings import COSTO_TOTAL_FABRICA, TOTAL_HORAS_FABRICA_MENSUAL
 import json
 
 
@@ -27,23 +27,33 @@ def get_cost_by_product(request, product_code):
     suggested_price = round(sum_cost / units * ((revenue / 100) + 1), 2)
     costo_unitario_mp = round(sum_cost / units, 2)
     current_revenue = round(((current_price / sum_cost * units) - 1) * 100, 2)
+    monthly_batches = int(TOTAL_HORAS_FABRICA_MENSUAL / cost.production_time)
+    estimate_monthly_sales = round(units * monthly_batches * current_price, 2)
+    estimate_monthly_cost = round(units * monthly_batches * costo_unitario_mp, 2)
+    prod_revenue_monthly = round(estimate_monthly_sales - estimate_monthly_cost, 2)
+    total_revenue_monthly = round(prod_revenue_monthly - COSTO_TOTAL_FABRICA, 2)
+    revenue_monthly = round(((estimate_monthly_sales / (estimate_monthly_cost + COSTO_TOTAL_FABRICA)) - 1) * 100, 2)
+
     response = {
         "product_name": cost.product_code.name,
         "units": units,
         "revenue": revenue,
-        "suggested_price": round(suggested_price + (COSTO_UNITARIO_PRODUCCION * cost.production_time / units), 2),
+        "suggested_price": round(suggested_price, 2),
         "costo_unitario_mp": costo_unitario_mp,
         "costo_mp": round(costo_unitario_mp * units, 2),
-        "costo_unitario_produccion": COSTO_UNITARIO_PRODUCCION,
-        "costo_produccion": 0, # round(COSTO_UNITARIO_PRODUCCION * cost.production_time, 2),
         "current_price": current_price,
         "production_time": cost.production_time,
         "current_revenue": current_revenue,
-        "utilidad_del_lote": round((current_price * units) - (costo_unitario_mp * units) - (COSTO_UNITARIO_PRODUCCION * cost.production_time), 2),
+        "utilidad_del_lote": round((current_price * units) - (costo_unitario_mp * units), 2),
         "current_sale_total": round(current_price * units, 2),
-        "costo_unitario_total": round(((costo_unitario_mp * units) + (COSTO_UNITARIO_PRODUCCION * cost.production_time)) / units, 2),
-        "costo_total": round((costo_unitario_mp * units) + (COSTO_UNITARIO_PRODUCCION * cost.production_time), 2),
+        "costo_unitario_total": round((costo_unitario_mp * units) / units, 2),
+        "costo_total": round((costo_unitario_mp * units), 2),
         "venta_total": round(current_price * units, 2),
+        "estimate_monthly_sales": estimate_monthly_sales,
+        "estimate_monthly_cost": estimate_monthly_cost,
+        "prod_revenue_monthly": prod_revenue_monthly,
+        "total_revenue_monthly": total_revenue_monthly,
+        "revenue_monthly": revenue_monthly,
         "cost_detail": sorted([gen_costs(d, recipe_count, sum_cost) for d in cost_detail], key=lambda x: x.get("percentage_over_cost"), reverse=True)
     }
     return JsonResponse(response)
@@ -72,6 +82,11 @@ def get_all_cost(request):
                 "venta_total": prod_cost.get("venta_total"),
                 "current_revenue": prod_cost.get("current_revenue"),
                 "production_time": prod_cost.get("production_time"),
+                "estimate_monthly_sales": prod_cost.get("estimate_monthly_sales"),
+                "estimate_monthly_cost": prod_cost.get("estimate_monthly_cost"),
+                "prod_revenue_monthly": prod_cost.get("prod_revenue_monthly"),
+                "total_revenue_monthly": prod_cost.get("total_revenue_monthly"),
+                "revenue_monthly": prod_cost.get("revenue_monthly"),
                 "utilidad_del_lote": prod_cost.get("utilidad_del_lote"),
             })
     prices = sorted(prices, key=lambda x: x.get("product_name"))
