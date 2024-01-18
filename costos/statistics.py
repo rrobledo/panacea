@@ -437,6 +437,7 @@ def get_planning(request):
                 ret = get_cost_by_product(request, prod.get("product_code"))
                 prod_cost = json.loads(ret.content)
                 prod["total_actual"] = prod["total_actual"] if prod["total_actual"] is not None else 0
+                prod["precio"] = prod_cost.get("current_price")
                 prod["costo_unitario_mp"] = prod_cost.get("costo_unitario_mp")
                 prod["costo_mp"] = prod_cost.get("costo_mp")
                 prod["costo_unitario_produccion"] = prod_cost.get("costo_unitario_produccion")
