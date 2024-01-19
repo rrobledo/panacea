@@ -334,7 +334,7 @@ def get_product_cronograma(request, product_code):
 
 def get_cronograma_by_week_of_month(request, week_of_month):
     sql = f"""
-        with pre_sales as (select c.nombre as article,
+        with sales as (select c.nombre as article,
                case 
                    when a.nombre in ('Facturas', 'Facturas x2') then 'Facturas' 
                    when a.nombre in ('Medialunas', 'Medialunas x2') then 'Medialunas'
@@ -383,26 +383,26 @@ def get_cronograma_by_week_of_month(request, week_of_month):
                    when extract(day from d.fechadocumento) between 24 and 31 then 4
                end = {week_of_month} 
            group by article, product, lugar_venta, week_of_month, serie, operation_date),
-        join_1 as (select distinct article, product from pre_sales),
-        join_2 as (select * from (values ('Dietetica'), ('Local')) as t(lugar_venta)),
-        join_3 as (select distinct week_of_month, serie, operation_date  from pre_sales),
-        keys as (select * from join_1, join_2, join_3),
-        sales as (
-         select k.article,
-                k.product,
-                k.lugar_venta,
-                k.week_of_month,
-                k.serie,
-                k.operation_date,
-                coalesce(p.total, 0) as total,
-                coalesce(p.subtotal, 0) as subtotal
-           from keys k
-            left outer join pre_sales p
-              on k.article = p.article
-             and k.product = p.product
-             and k.lugar_venta = p.lugar_venta
-             and k.operation_date = p.operation_date
-        ),
+        --join_1 as (select distinct article, product from pre_sales),
+        --join_2 as (select * from (values ('Dietetica'), ('Local')) as t(lugar_venta)),
+        --join_3 as (select distinct week_of_month, serie, operation_date  from pre_sales),
+        --keys as (select * from join_1, join_2, join_3),
+        --sales2 as (
+        -- select k.article,
+        -- 	    k.product,
+        -- 	    k.lugar_venta,
+        -- 	    k.week_of_month,
+        -- 	    k.serie,
+        -- 	    k.operation_date,
+        -- 	    coalesce(p.total, 0) as total,
+        -- 	    coalesce(p.subtotal, 0) as subtotal
+        --   from keys k
+        --   	left outer join pre_sales p
+        --   	  on k.article = p.article
+        --   	 and k.product = p.product
+        --   	 and k.lugar_venta = p.lugar_venta
+        --   	 and k.operation_date = p.operation_date
+        --),
         values as (select distinct week_of_month,
                article,
                product
