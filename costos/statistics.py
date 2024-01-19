@@ -92,6 +92,7 @@ def get_all_cost(request):
     prices = sorted(prices, key=lambda x: x.get("product_name"))
     return JsonResponse(prices, safe=False)
 
+
 def get_product_history(request, product_code):
     def dictfetchall(cursor):
         """
@@ -331,6 +332,203 @@ def get_product_cronograma(request, product_code):
     }, safe=False)
 
 
+def get_cronograma_by_week_of_month(request, week_of_month):
+    sql = f"""
+        with pre_sales as (select c.nombre as article,
+                a.nombre as product,
+                case 
+                    when d.idcliente = 0 then 'Local'
+                    else 'Dietetica'
+                end as lugar_venta,
+               case
+                   when extract(day from d.fechadocumento) between 1 and 7 then 1
+                   when extract(day from d.fechadocumento) between 8 and 15 then 2
+                   when extract(day from d.fechadocumento) between 16 and 23 then 3
+                   when extract(day from d.fechadocumento) between 24 and 31 then 4
+               end as week_of_month,
+               concat(
+                case 
+                    when extract(isodow from d.fechadocumento) = 1 then '01 Lunes' 
+                    when extract(isodow from d.fechadocumento) = 2 then '02 Martes'
+                    when extract(isodow from d.fechadocumento) = 3 then '03 Miercoles'
+                    when extract(isodow from d.fechadocumento) = 4 then '04 Jueves'
+                    when extract(isodow from d.fechadocumento) = 5 then '05 Viernes'
+                    when extract(isodow from d.fechadocumento) = 6 then '06 Sabado'
+                    when extract(isodow from d.fechadocumento) = 7 then '01 Lunes'
+                end
+               ) as serie,
+               to_char(d.fechadocumento, 'YYYY-MM-DD') as operation_date,
+               sum(case 
+                when a.nombre like '%x2%' then 2
+                when a.nombre like '%x3%' then 3
+                else 1
+               end * dd.cantidad) as total,
+               sum(dd.subtotal) as subtotal
+          from documentos d 
+            join documentosdetalles dd
+              on d.iddocumento = dd.iddocumento 
+            join articulos a 
+              on dd.idarticulo = a.idarticulo   
+            join categorias c
+              on a.idcategoria = c.idcategoria
+         where d.fechadocumento > CURRENT_DATE - INTERVAL '2 months'
+            and case
+                   when extract(day from d.fechadocumento) between 1 and 7 then 1
+                   when extract(day from d.fechadocumento) between 8 and 15 then 2
+                   when extract(day from d.fechadocumento) between 16 and 23 then 3
+                   when extract(day from d.fechadocumento) between 24 and 31 then 4
+               end = {week_of_month} 
+           group by article, product, lugar_venta, week_of_month, serie, operation_date),
+        join_1 as (select distinct article, product from pre_sales),
+        join_2 as (select * from (values ('Dietetica'), ('Local')) as t(lugar_venta)),
+        join_3 as (select distinct week_of_month, serie, operation_date  from pre_sales),
+        keys as (select * from join_1, join_2, join_3),
+        sales as (
+         select k.article,
+                k.product,
+                k.lugar_venta,
+                k.week_of_month,
+                k.serie,
+                k.operation_date,
+                coalesce(p.total, 0) as total,
+                coalesce(p.subtotal, 0) as subtotal
+           from keys k
+            left outer join pre_sales p
+              on k.article = p.article
+             and k.product = p.product
+             and k.lugar_venta = p.lugar_venta
+             and k.operation_date = p.operation_date
+        ),
+        values as (select distinct week_of_month,
+               article,
+               product
+          from sales
+         order by 1),
+        report as (select week_of_month, 
+                product,
+               (select coalesce(avg(s.total)::int, 0)
+                  from sales s
+                 where s.week_of_month = v.week_of_month 
+                   and s.article = v.article
+                   and s.product = s.product
+                   and s.lugar_venta = 'Dietetica'
+                   and s.serie = '01 Lunes') as lunes_dietetica,
+               (select coalesce(avg(s.total)::int, 0)
+                  from sales s
+                 where s.week_of_month = v.week_of_month
+                   and s.article = v.article
+                   and s.product = s.product
+                   and s.lugar_venta = 'Local'
+                   and s.serie = '01 Lunes') as lunes_local,
+               ----   MARTES ----
+               (select coalesce(avg(s.total)::int, 0)
+                  from sales s
+                 where s.week_of_month = v.week_of_month
+                   and s.article = v.article
+                   and s.product = s.product
+                   and s.lugar_venta = 'Dietetica'
+                   and s.serie = '02 Martes') as martes_dietetica,
+               (select coalesce(avg(s.total)::int, 0)
+                  from sales s
+                 where s.week_of_month = v.week_of_month
+                   and s.article = v.article
+                   and s.product = s.product
+                   and s.lugar_venta = 'Local'
+                   and s.serie = '02 Martes') as martes_local,
+               ----   MIERCOLES ----
+               (select coalesce(avg(s.total)::int, 0)
+                  from sales s
+                 where s.week_of_month = v.week_of_month
+                   and s.article = v.article
+                   and s.product = s.product
+                   and s.lugar_venta = 'Dietetica'
+                   and s.serie = '03 Miercoles') as miercoles_dietetica,
+               (select coalesce(avg(s.total)::int, 0)
+                  from sales s
+                 where s.week_of_month = v.week_of_month
+                   and s.article = v.article
+                   and s.product = s.product
+                   and s.lugar_venta = 'Local'
+                   and s.serie = '03 Miercoles') as miercoles_local,
+               ----   JUEVES ----
+               (select coalesce(avg(s.total)::int, 0)
+                  from sales s
+                 where s.week_of_month = v.week_of_month
+                   and s.article = v.article
+                   and s.product = s.product
+                   and s.lugar_venta = 'Dietetica'
+                   and s.serie = '04 Jueves') as jueves_dietetica,
+               (select coalesce(avg(s.total)::int, 0)
+                  from sales s
+                 where s.week_of_month = v.week_of_month
+                   and s.article = v.article
+                   and s.product = s.product
+                   and s.lugar_venta = 'Local'
+                   and s.serie = '04 Jueves') as jueves_local,
+               ----   VIERNES ----
+               (select coalesce(avg(s.total)::int, 0)
+                  from sales s
+                 where s.week_of_month = v.week_of_month
+                   and s.article = v.article
+                   and s.product = s.product
+                   and s.lugar_venta = 'Dietetica'
+                   and s.serie = '05 Viernes') as viernes_dietetica,
+               (select coalesce(avg(s.total)::int, 0)
+                  from sales s
+                 where s.week_of_month = v.week_of_month
+                   and s.article = v.article
+                   and s.product = s.product
+                   and s.lugar_venta = 'Local'
+                   and s.serie = '05 Viernes') as viernes_local,
+               ----   SABADO ----
+               (select coalesce(avg(s.total)::int, 0)
+                  from sales s
+                 where s.week_of_month = v.week_of_month
+                   and s.article = v.article
+                   and s.product = s.product
+                   and s.lugar_venta = 'Dietetica'
+                   and s.serie = '06 Sabado') as sabado_dietetica,
+               (select coalesce(avg(s.total)::int, 0)
+                  from sales s
+                 where s.week_of_month = v.week_of_month
+                   and s.article = v.article
+                   and s.product = s.product
+                   and s.lugar_venta = 'Local'
+                   and s.serie = '06 Sabado') as sabado_local
+          from values v)
+        select week_of_month,
+               product,
+               lunes_dietetica,
+               lunes_local,
+               lunes_dietetica + lunes_local as lunes,
+               martes_dietetica,
+               martes_local,
+               martes_dietetica + martes_local as martes,
+               miercoles_dietetica,
+               miercoles_local,
+               miercoles_dietetica + miercoles_local as miercoles, 
+               jueves_dietetica,
+               jueves_local,
+               jueves_dietetica + jueves_local as jueves, 
+               viernes_dietetica,
+               viernes_local,
+               viernes_dietetica + viernes_local as viernes, 
+               sabado_dietetica,
+               sabado_local,
+               sabado_dietetica + sabado_local as sabado,
+               lunes_dietetica + martes_dietetica + miercoles_dietetica + jueves_dietetica + viernes_dietetica + sabado_dietetica  as total_semanal_dietetica,
+               lunes_local + martes_local + miercoles_local + jueves_local + viernes_local + sabado_local as total_semanal_local,
+               lunes_dietetica + lunes_local + martes_dietetica + martes_local + miercoles_dietetica + miercoles_local + jueves_dietetica + jueves_local + viernes_dietetica + viernes_local + sabado_dietetica + sabado_local as total_semanal        
+          from report
+        order by product, week_of_month    
+    """
+    with connection.cursor() as cursor:
+        cursor.execute(sql)
+        result = _dictfetchall(cursor)
+
+    return JsonResponse(result, safe=False)
+
+
 def get_planning(request):
 
     sql_planning = """
@@ -378,7 +576,8 @@ def get_planning(request):
             join documentosdetalles dd
               on d.iddocumento = dd.iddocumento 
             join articulos a 
-              on dd.idarticulo = a.idarticulo 
+              on dd.idarticulo = a.idarticulo
+             and a.nombre not in ('Medialunas x2', 'Facturas x2') 
             join categorias c
               on a.idcategoria = c.idcategoria),
         planning as (
