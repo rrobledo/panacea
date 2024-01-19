@@ -335,7 +335,11 @@ def get_product_cronograma(request, product_code):
 def get_cronograma_by_week_of_month(request, week_of_month):
     sql = f"""
         with pre_sales as (select c.nombre as article,
-                a.nombre as product,
+               case 
+                   when a.nombre in ('Facturas', 'Facturas x2') then 'Facturas' 
+                   when a.nombre in ('Medialunas', 'Medialunas x2') then 'Medialunas'
+                   else a.nombre 
+               end as product,
                 case 
                     when d.idcliente = 0 then 'Local'
                     else 'Dietetica'
@@ -577,7 +581,6 @@ def get_planning(request):
               on d.iddocumento = dd.iddocumento 
             join articulos a 
               on dd.idarticulo = a.idarticulo
-             and a.nombre not in ('Medialunas x2', 'Facturas x2') 
             join categorias c
               on a.idcategoria = c.idcategoria),
         planning as (
