@@ -536,7 +536,12 @@ def get_cronograma_by_week_of_month(request, week_of_month):
 def get_planning(request):
 
     sql_planning = """
-        with sales as (select a.idarticulo as product_id, c.nombre as article,
+        with sales as (select 
+               case 
+                   when a.nombre in ('Facturas', 'Facturas x2', 'Medialunas', 'Medialunas x2') then 106 
+                   else a.idarticulo 
+               end as product_id,
+               c.nombre as article,
                case 
                    when a.nombre in ('Facturas', 'Facturas x2', 'Medialunas', 'Medialunas x2') then 'Facturas-Medialunas' 
                    else a.nombre 
