@@ -104,7 +104,47 @@ def get_product_history(request, product_code):
 
     sql_with_sales = """
         with sales as (select c.nombre as article,
-               a.nombre as product,
+               trim(a.nombre) as product,
+               concat(
+                date_part('year', d.fechadocumento),
+                '-',
+                to_char(date_part('month', d.fechadocumento), 'fm00'),
+                case
+                    when date_part('month', d.fechadocumento) = 1 then 'Ene'
+                    when date_part('month', d.fechadocumento) = 2 then 'Feb'
+                    when date_part('month', d.fechadocumento) = 3 then 'Mar'
+                    when date_part('month', d.fechadocumento) = 4 then 'Abr'
+                    when date_part('month', d.fechadocumento) = 5 then 'May'
+                    when date_part('month', d.fechadocumento) = 6 then 'Jun'
+                    when date_part('month', d.fechadocumento) = 7 then 'Jul'
+                    when date_part('month', d.fechadocumento) = 8 then 'Ago'
+                    when date_part('month', d.fechadocumento) = 9 then 'Oct'
+                    when date_part('month', d.fechadocumento) = 10 then 'Sep'
+                    when date_part('month', d.fechadocumento) = 11 then 'Nov'
+                    when date_part('month', d.fechadocumento) = 12 then 'Dic'
+                end
+               ) as month_of_year,
+               concat(
+                date_part('year', d.fechadocumento),
+                to_char(date_part('week', d.fechadocumento), 'fm00'),
+                to_char(date_part('month', d.fechadocumento), 'fm00')
+               ) as week_of_year_old,
+               to_char(d.fechadocumento, 'YYYY-MM-DD') as operation_data,
+               case 
+                when a.nombre like '%x2%' then 2
+                when a.nombre like '%x3%' then 3
+                else 1
+               end * dd.cantidad as total,
+               dd.subtotal
+          from documentos d 
+            join documentosdetalles dd
+              on d.iddocumento = dd.iddocumento 
+            join articulos a 
+              on dd.idarticulo = a.idarticulo 
+            join categorias c
+              on a.idcategoria = c.idcategoria
+       union select 'TOTAL' as article,
+               'TOTAL' as product,
                concat(
                 date_part('year', d.fechadocumento),
                 '-',
