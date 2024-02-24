@@ -103,7 +103,7 @@ def get_product_history(request, product_code):
         return [dict(zip(columns, row)) for row in cursor.fetchall()]
 
     sql_with_sales = """
-        with sales as (select c.nombre as article,
+        with sales as (select trim(coalesce(c.nombre, 'Otros')) as article,
                trim(a.nombre) as product,
                concat(
                 date_part('year', d.fechadocumento),
@@ -141,7 +141,7 @@ def get_product_history(request, product_code):
               on d.iddocumento = dd.iddocumento 
             join articulos a 
               on dd.idarticulo = a.idarticulo 
-            join categorias c
+            left outer join categorias c
               on a.idcategoria = c.idcategoria
        union select 'TOTAL' as article,
                'TOTAL' as product,
@@ -181,7 +181,7 @@ def get_product_history(request, product_code):
               on d.iddocumento = dd.iddocumento 
             join articulos a 
               on dd.idarticulo = a.idarticulo 
-            join categorias c
+            left outer join categorias c
               on a.idcategoria = c.idcategoria)
     """
     sql_products = f"""
