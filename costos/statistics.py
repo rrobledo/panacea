@@ -3,8 +3,10 @@ from django.http import JsonResponse
 from .models import Costs, CostsDetails
 from vercel_app.settings import COSTO_TOTAL_FABRICA, TOTAL_HORAS_FABRICA_MENSUAL
 import json
+from functools import lru_cache
 
 
+@lru_cache(10)
 def get_cost_by_product(request, product_code):
     def gen_costs(d, recipe_count, total_cost):
         return {
