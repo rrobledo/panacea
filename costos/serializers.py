@@ -1,4 +1,4 @@
-from .models import Supplies, Products, Costs, CostsDetails
+from .models import Supplies, Products, Costs, CostsDetails, Compras
 from rest_framework import serializers
 
 
@@ -32,5 +32,5 @@ class CostsDetailsSerializer(serializers.HyperlinkedModelSerializer):
 
 class ComprasSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
-        model = Costs
+        model = Compras
         fields = ["id", "data", "ticket_number", "provider", "notes", "amount"]
