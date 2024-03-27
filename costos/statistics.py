@@ -670,19 +670,19 @@ def get_planning(request):
               select *,
          (select sum(total)
           from sales
-         where month_of_year = '2024-02Feb'
+         where month_of_year = '2024-03Mar'
            and product_id = total.product_id
          ) total_actual,
          (select sum(total)
           from sales
-         where month_of_year = '2024-02Feb'
+         where month_of_year = '2024-03Mar'
            and product_id = total.product_id
          ) * precio as total_venta_actual
           from total
-         where month = 'Febrero')
+         where month = 'Marzo')
         select *
           from subtotal
-         where month = 'Febrero'
+         where month = 'Marzo'
          order by product_name    
     """
     with connection.cursor() as cursor:
