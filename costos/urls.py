@@ -15,11 +15,11 @@ class OptionalSlashRouter(DefaultRouter):
 
 
 router = OptionalSlashRouter()
-router.register(r'supplies', views.SuppliesViewSet)
+# router.register(r'supplies', views.SuppliesViewSet)
 router.register(r'insumos', views.SuppliesViewSet)
-router.register(r'products', views.ProductsViewSet)
+# router.register(r'products', views.ProductsViewSet)
 router.register(r'productos', views.ProductsViewSet)
-router.register(r'costs', views.CostsViewSet)
+# router.register(r'costs', views.CostsViewSet)
 router.register(r'costos', views.CostsViewSet)
 router.register(r'gastos', views.ComprasViewSet)
 router.register(r'costs_details', views.CostsDetailsViewSet, basename='CostsDetailsViewSet')
