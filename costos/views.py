@@ -1,7 +1,7 @@
 from .models import Supplies, Products, Costs, CostsDetails, Compras
 from .serializers import SupplySerializer, ProductSerializer, CostSerializer, CostsDetailsSerializer, ComprasSerializer
 from rest_framework import viewsets
-
+from rest_framework_swagger.views import get_swagger_view
 
 # ViewSets define the view behavior.
 class SuppliesViewSet(viewsets.ModelViewSet):
