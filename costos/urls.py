@@ -1,4 +1,5 @@
 from django.urls import path, include
+from django.http import JsonResponse
 from rest_framework import routers
 from . import views, statistics
 
@@ -12,6 +13,10 @@ class OptionalSlashRouter(DefaultRouter):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.trailing_slash = '/?'
+
+
+def get_categories(request):
+    return JsonResponse(["Materia Prima", "Honorarios", "Servicios", "Mantenimiento", "Delivery", "Impuestos"], safe=False)
 
 
 router = OptionalSlashRouter()
@@ -34,4 +39,5 @@ urlpatterns = [
     path('products/<str:product_code>/cronograma', statistics.get_product_cronograma, name='get_product_cronograma'),
     path('cronograma/<int:week_of_month>', statistics.get_cronograma_by_week_of_month, name='get_cronograma_by_week_of_month'),
     path('planning', statistics.get_planning, name='get_planning'),
+    path('categorias', get_categories),
 ]
