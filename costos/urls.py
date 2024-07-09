@@ -6,8 +6,10 @@ from . import views, statistics
 # Routers provide an easy way of automatically determining the URL conf.
 #router = routers.DefaultRouter()
 from rest_framework.routers import DefaultRouter
+from rest_framework_nested.routers import SimpleRouter, NestedSimpleRouter
 
-class OptionalSlashRouter(DefaultRouter):
+
+class OptionalSlashRouter(SimpleRouter):
     """Make all trailing slashes optional in the URLs used by the viewsets
     """
     def __init__(self, *args, **kwargs):
@@ -27,10 +29,14 @@ router.register(r'productos', views.ProductsViewSet)
 # router.register(r'costs', views.CostsViewSet)
 router.register(r'costos', views.CostsViewSet)
 router.register(r'gastos', views.ComprasViewSet)
-router.register(r'costs_details', views.CostsDetailsViewSet, basename='CostsDetailsViewSet')
+# router.register(r'costos/<str:code_cost>/cost_detail', views.CostsDetailsViewSet, basename='CostsDetailsViewSet')
+costos_router = NestedSimpleRouter(router, r'costos', lookup='costo')
+costos_router.register(r'costos_detail', views.CostsDetailsViewSet, basename='costos_detail')
+# router.register(r'costs_details', views.CostsDetailsViewSet, basename='CostsDetailsViewSet')
 
 urlpatterns = [
     path('', include(router.urls)),
+    path('', include(costos_router.urls)),
     # path('reports/prices', statistics.get_all_cost, name='get_all_cost', ),
     path('costos_materia_prima', statistics.get_all_cost, name='get_all_cost', ),
     path('costos_materia_prima/<str:product_code>', statistics.get_cost_by_product, name='get_cost_by_product'),

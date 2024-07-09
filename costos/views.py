@@ -25,11 +25,11 @@ class CostsDetailsViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         """
-        Optionally restricts the returned purchases to a given user,
-        by filtering against a `username` query parameter in the URL.
+        Optionally restricts the returned purchases to a given cost,
+        by filtering against a `cost` query parameter in the URL.
         """
         queryset = CostsDetails.objects.all()
-        code_cost = self.request.query_params.get('cost_code')
+        code_cost = self.kwargs.get('costo_pk')
         if code_cost is not None:
             queryset = queryset.filter(cost_code=code_cost)
         return queryset
