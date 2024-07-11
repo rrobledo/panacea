@@ -21,7 +21,7 @@ class Products(models.Model):
 
 class Costs(models.Model):
     code = models.CharField(max_length=50, primary_key=True)
-    product_code = models.ForeignKey(Products, on_delete=models.CASCADE)
+    product_code = models.ForeignKey(Products, on_delete=models.RESTRICT)
     revenue = models.FloatField()
     current_price = models.FloatField()
     units = models.IntegerField()
@@ -39,8 +39,8 @@ class CostsDetails(models.Model):
         ("F", "Fixed"),
         ("V", "Variable"),
     ]
-    cost_code = models.ForeignKey(Costs, on_delete=models.CASCADE)
-    supply_code = models.ForeignKey(Supplies, on_delete=models.CASCADE)
+    cost_code = models.ForeignKey(Costs, on_delete=models.RESTRICT)
+    supply_code = models.ForeignKey(Supplies, on_delete=models.RESTRICT)
     amount = models.IntegerField()
     type = models.CharField(max_length=1, choices=COST_TYPES)
 
