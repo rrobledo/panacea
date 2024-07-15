@@ -18,7 +18,7 @@ class SuppliesViewSet(viewsets.ModelViewSet):
         """
         name = self.request.query_params.get('name')
         if name is not None:
-            return Supplies.objects.order_by("name").filter(name__contains=name)
+            return Supplies.objects.order_by("name").filter(name__icontains=name)
         return Supplies.objects.order_by("name").all()
 
 
