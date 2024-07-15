@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'costos.apps.CostosConfig',
     'drf_yasg',
     'corsheaders',
+    'django_filters',
 ]
 
 MIDDLEWARE = [
@@ -146,7 +147,8 @@ REST_FRAMEWORK = {
     # Use Django's standard `django.contrib.auth` permissions,
     # or allow read-only access for unauthenticated users.
     'DEFAULT_AUTHENTICATION_CLASSES': [],
-    'DEFAULT_PERMISSION_CLASSES': []
+    'DEFAULT_PERMISSION_CLASSES': [],
+    'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend']
 }
 
 CORS_ALLOW_ALL_ORIGINS = True  # If this is used then `CORS_ALLOWED_ORIGINS` will not have any effect

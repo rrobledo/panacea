@@ -1,13 +1,25 @@
 from .models import Supplies, Products, Costs, CostsDetails, Compras
 from .serializers import SupplySerializer, ProductSerializer, CostSerializer, CostsDetailsSerializer, ComprasSerializer
 from rest_framework import viewsets
-from rest_framework.response import Response
-from rest_framework_swagger.views import get_swagger_view
+from rest_framework import filters
+
 
 # ViewSets define the view behavior.
 class SuppliesViewSet(viewsets.ModelViewSet):
     queryset = Supplies.objects.order_by("name").all()
     serializer_class = SupplySerializer
+    filter_backends = [filters.SearchFilter]
+    search_fields = ['name']
+
+    def get_queryset(self):
+        """
+        This view should return a list of all the purchases
+        for the currently authenticated user.
+        """
+        name = self.request.query_params.get('name')
+        if name is not None:
+            return Supplies.objects.order_by("name").filter(name__contains=name)
+        return Supplies.objects.order_by("name").all()
 
 
 class ProductsViewSet(viewsets.ModelViewSet):
