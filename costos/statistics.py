@@ -60,7 +60,7 @@ def get_cost_by_product(request, producto_id):
 def get_all_cost(request):
     costs = Productos.objects.all()
     prices = []
-    for cost in costs[:2]:
+    for cost in costs:
         if cost.lote_produccion > 1:
             ret = get_cost_by_product(request, cost.id)
             prod_cost = json.loads(ret.content)
