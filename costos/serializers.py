@@ -1,53 +1,42 @@
-from .models import Supplies, Products, Costs, CostsDetails, Compras
+from .models import Insumos, Productos, Costos
 from rest_framework import serializers
 from django.urls import reverse
 
 
 # Serializers define the API representation.
-class SupplySerializer(serializers.HyperlinkedModelSerializer):
+class InsumosSerializer(serializers.HyperlinkedModelSerializer):
     absolute_url = serializers.SerializerMethodField()
 
     def get_absolute_url(self, obj):
         request = self.context.get('request')
         base_url = f"{request.scheme}://{request.get_host()}"
-        absolute_url = reverse('supplies-detail', args=[str(obj.code)])
+        absolute_url = reverse('insumos-detail', args=[str(obj.id)])
         return f"{base_url}{absolute_url}"
 
     class Meta:
-        model = Supplies
-        fields = ["absolute_url", "id", "code", "name", "measure", "measure_units", "price"]
+        model = Insumos
+        fields = ["absolute_url", "id", "nombre", "unidad_medida", "cantidad", "precio"]
 
 
-class ProductSerializer(serializers.HyperlinkedModelSerializer):
-    class Meta:
-        model = Products
-        fields = ['code', 'name', 'ref_id']
-
-
-class CostSerializer(serializers.HyperlinkedModelSerializer):
+class ProductosSerializer(serializers.HyperlinkedModelSerializer):
     absolute_url = serializers.SerializerMethodField()
 
     def get_absolute_url(self, obj):
         request = self.context.get('request')
         base_url = f"{request.scheme}://{request.get_host()}"
-        absolute_url = reverse('costs-detail', args=[str(obj.code)])
+        absolute_url = reverse('productos-detail', args=[str(obj.id)])
         return f"{base_url}{absolute_url}"
 
     class Meta:
-        model = Costs
-        fields = ["absolute_url", "id", "code", "product_code", "revenue", "current_price", "units", "measure_units", "production_time"]
+        model = Productos
+        fields = ["absolute_url", 'id', 'codigo', 'nombre', "ref_id", "utilidad", "precio_actual", "unidad_medida", "lote_produccion", "tiempo_produccion"]
 
 
-class CostsDetailsSerializer(serializers.HyperlinkedModelSerializer):
-    supply_name = serializers.CharField(source='supply_code.name', required=False, read_only=True)
-    supply_measure_units = serializers.CharField(source='supply_code.measure_units', required=False, read_only=True)
+class CostosSerializer(serializers.HyperlinkedModelSerializer):
+    insumo_nombre = serializers.CharField(source='insumo.nombre', required=False, read_only=True)
+    insumo_unidad_medida = serializers.CharField(source='insumo.unidad_medida', required=False, read_only=True)
 
     class Meta:
-        model = CostsDetails
-        fields = ["id", "cost_code", "supply_code", 'supply_name', "supply_measure_units", "amount", "type"]
+        model = Costos
+        fields = ["id", "producto", "insumo", 'insumo_nombre', "insumo_unidad_medida", "cantidad"]
 
-
-class ComprasSerializer(serializers.HyperlinkedModelSerializer):
-    class Meta:
-        model = Compras
-        fields = ["id", "data", "ticket_number", "provider", "notes", "amount"]
