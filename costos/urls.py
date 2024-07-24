@@ -34,6 +34,7 @@ urlpatterns = [
     path('', include(costos_router.urls)),
     path('costos_materia_prima', statistics.get_all_cost, name='get_all_cost', ),
     path('costos_materia_prima/<str:producto_id>', statistics.get_cost_by_product, name='get_cost_by_product'),
+    path('planning_2024', statistics.get_planning_2024, name='get_planning_2024'),
     path('products/<str:product_code>/history', statistics.get_product_history, name='get_product_history'),
     path('products/<str:product_code>/cronograma', statistics.get_product_cronograma, name='get_product_cronograma'),
     path('cronograma/<int:week_of_month>', statistics.get_cronograma_by_week_of_month, name='get_cronograma_by_week_of_month'),

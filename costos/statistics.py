@@ -746,6 +746,170 @@ def get_planning(request):
     return JsonResponse(planning, safe=False)
 
 
+def get_planning_2024(request):
+    sql = f"""
+        with planning as (
+                select p.codigo as product_id, 
+                       p.productos as product_name,
+                       jan2024 as enero_plan,
+                       (select coalesce(sum(count), 0)
+                          from panacea_sales s
+                         where s.operation_year = 2024
+                           and s.operation_month = 1
+                           and s.product_id = p.codigo
+                         )::int enero_real,
+                       feb2024 as febrero,
+                       (select coalesce(sum(count), 0)
+                          from panacea_sales s
+                         where s.operation_year = 2024
+                           and s.operation_month = 2
+                           and s.product_id = p.codigo
+                         )::int febrero_real, 
+                       mar2024 as marzo,
+                       (select coalesce(sum(count), 0)
+                          from panacea_sales s
+                         where s.operation_year = 2024
+                           and s.operation_month = 3
+                           and s.product_id = p.codigo
+                         )::int marzo_real, 
+                       apr2024 as abril,
+                       (select coalesce(sum(count), 0)
+                          from panacea_sales s
+                         where s.operation_year = 2024
+                           and s.operation_month = 4
+                           and s.product_id = p.codigo
+                         )::int abril_real,
+                       may2024 as mayo,
+                       may2024corr as mayo_corregido,
+                       (select coalesce(sum(count), 0)
+                          from panacea_sales s
+                         where s.operation_year = 2024
+                           and s.operation_month = 5
+                           and s.product_id = p.codigo
+                       )::int mayo_real,
+                       jun2024 as junio,
+                       jun2024corr as junio_corregido,
+                       (select coalesce(sum(count), 0)
+                          from panacea_sales s
+                         where s.operation_year = 2024
+                           and s.operation_month = 6
+                           and s.product_id = p.codigo
+                       )::int junio_real,
+                       jul2024 as julio,
+                       jul2024corr as julio_corregido,
+                       (select coalesce(sum(count), 0)
+                          from panacea_sales s
+                         where s.operation_year = 2024
+                           and s.operation_month = 7
+                           and s.product_id = p.codigo
+                       )::int julio_real,
+                       aug2024 as agosto,
+                       (select coalesce(sum(count), 0)
+                          from panacea_sales s
+                         where s.operation_year = 2024
+                           and s.operation_month = 8
+                           and s.product_id = p.codigo
+                       )::int agosto_real,
+                       sep2024 as septiembre,
+                       (select coalesce(sum(count), 0)
+                          from panacea_sales s
+                         where s.operation_year = 2024
+                           and s.operation_month = 9
+                           and s.product_id = p.codigo
+                       )::int septiembre_real,
+                       oct2024 as octubre,
+                       (select coalesce(sum(count), 0)
+                          from panacea_sales s
+                         where s.operation_year = 2024
+                           and s.operation_month = 10
+                           and s.product_id = p.codigo
+                       )::int octubre_real,
+                       nov2024 as noviembre,
+                       (select coalesce(sum(count), 0)
+                          from panacea_sales s
+                         where s.operation_year = 2024
+                           and s.operation_month = 11
+                           and s.product_id = p.codigo
+                       )::int noviembre_real,
+                       dec2024 as diciembre,
+                       (select coalesce(sum(count), 0)
+                          from panacea_sales s
+                         where s.operation_year = 2024
+                           and s.operation_month = 12
+                           and s.product_id = p.codigo
+                       )::int diciembre_real
+                  from planificacion2024 p 
+                 where p.productos not in ('Total unidades'))
+        select product_id as ref_id,
+              product_name as producto,
+              enero_plan,
+              enero_real,
+              febrero,
+              febrero_real,
+              marzo,
+              marzo_real,
+              abril,
+              abril_real,
+              mayo,
+              mayo_corregido,
+              mayo_real,
+              junio,
+              junio_corregido,
+              junio_real,
+              julio,
+              julio_corregido,
+              julio_real,
+              agosto,
+              agosto_real,
+              septiembre,
+              septiembre_real,
+              octubre,
+              octubre_real,
+              noviembre,
+              noviembre_real,
+              diciembre,
+              diciembre_real
+          from planning
+        union
+        select null as ref_id,
+              null as producto,
+              sum(enero_plan),
+              sum(enero_real),
+              sum(febrero),
+              sum(febrero_real),
+              sum(marzo),
+              sum(marzo_real),
+              sum(abril),
+              sum(abril_real),
+              sum(mayo),
+              sum(mayo_corregido),
+              sum(mayo_real),
+              sum(junio),
+              sum(junio_corregido),
+              sum(junio_real),
+              sum(julio),
+              sum(julio_corregido),
+              sum(julio_real),
+              sum(agosto),
+              sum(agosto_real),
+              sum(septiembre),
+              sum(septiembre_real),
+              sum(octubre),
+              sum(octubre_real),
+              sum(noviembre),
+              sum(noviembre_real),
+              sum(diciembre),
+              sum(diciembre_real)
+          from planning
+        order by 2;
+    """
+    with connection.cursor() as cursor:
+        cursor.execute(sql)
+        result = _dictfetchall(cursor)
+
+    return JsonResponse(result, safe=False)
+
+
 def _dictfetchall(cursor):
     """
     Return all rows from a cursor as a dict.
