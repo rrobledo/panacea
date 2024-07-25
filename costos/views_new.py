@@ -60,7 +60,7 @@ class ProgramacionViewSet(viewsets.ModelViewSet):
         Optionally restricts the returned purchases to a given cost,
         by filtering against a `cost` query parameter in the URL.
         """
-        queryset = Programacion.objects.all()
+        queryset = Programacion.objects.order_by("producto__nombre").all()
         year = self.kwargs.get('year')
         if year is not None:
             queryset = queryset.filter(year=year)
