@@ -1,5 +1,5 @@
-from .models import Insumos, Productos, Costos
-from .serializers import InsumosSerializer, ProductosSerializer, CostosSerializer
+from .models import Insumos, Productos, Costos, Programacion
+from .serializers import InsumosSerializer, ProductosSerializer, CostosSerializer, ProgramacionSerializer
 from rest_framework import viewsets
 from rest_framework import filters
 
@@ -51,3 +51,17 @@ class CostosViewSet(viewsets.ModelViewSet):
             queryset = queryset.filter(producto_id=producto_id)
         return queryset
 
+
+class ProgramacionViewSet(viewsets.ModelViewSet):
+    serializer_class = ProgramacionSerializer
+
+    def get_queryset(self):
+        """
+        Optionally restricts the returned purchases to a given cost,
+        by filtering against a `cost` query parameter in the URL.
+        """
+        queryset = Programacion.objects.all()
+        year = self.kwargs.get('year')
+        if year is not None:
+            queryset = queryset.filter(year=year)
+        return queryset

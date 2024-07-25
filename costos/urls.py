@@ -24,10 +24,12 @@ def get_categories(request):
 router = OptionalSlashRouter()
 router.register(r'insumos', views_new.InsumosViewSet)
 router.register(r'productos', views_new.ProductosViewSet)
-
+router.register(r'programacion', views_new.ProgramacionViewSet, basename="programacion")
 
 costos_router = NestedSimpleRouter(router, r'productos', lookup='producto')
 costos_router.register(r'costos', views_new.CostosViewSet, basename='costos')
+
+
 
 urlpatterns = [
     path('', include(router.urls)),
