@@ -63,7 +63,7 @@ class ProgramacionViewSet(viewsets.ModelViewSet):
         by filtering against a `cost` query parameter in the URL.
         """
         queryset = Programacion.objects.order_by("producto__nombre").all()
-        responsable = self.kwargs.get('responsable')
+        responsable = self.request.query_params.get('responsable')
         if responsable is not None:
             if responsable != "Todos":
                 queryset = queryset.filter(responsable=responsable)
