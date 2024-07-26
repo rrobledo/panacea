@@ -63,9 +63,10 @@ class ProgramacionViewSet(viewsets.ModelViewSet):
         by filtering against a `cost` query parameter in the URL.
         """
         queryset = Programacion.objects.order_by("producto__nombre").all()
-        year = self.kwargs.get('year')
-        if year is not None:
-            queryset = queryset.filter(year=year)
+        responsable = self.kwargs.get('responsable')
+        if responsable is not None:
+            if responsable != "Todos":
+                queryset = queryset.filter(responsable=responsable)
         return queryset
 
     def partial_update(self, request, pk=None):
