@@ -2,6 +2,8 @@ from .models import Insumos, Productos, Costos, Programacion
 from .serializers import InsumosSerializer, ProductosSerializer, CostosSerializer, ProgramacionSerializer
 from rest_framework import viewsets
 from rest_framework import filters
+from rest_framework.response import Response
+from rest_framework import status
 
 
 # ViewSets define the view behavior.
@@ -65,3 +67,14 @@ class ProgramacionViewSet(viewsets.ModelViewSet):
         if year is not None:
             queryset = queryset.filter(year=year)
         return queryset
+
+    def partial_update(self, request, pk=None):
+        if isinstance(request.data, list):
+            for item in request.data:
+                instance = Programacion.objects.get(id=item.get("id"))
+                serializer = self.get_serializer(instance, data=item, partial=True)
+                serializer.is_valid(raise_exception=True)
+                self.perform_update(serializer)
+        else:
+            return super().partial_update(request.data, pk=pk)
+        return Response(status=status.HTTP_200_OK)

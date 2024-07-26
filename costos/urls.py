@@ -1,11 +1,8 @@
 from django.urls import path, include
 from django.http import JsonResponse
-from rest_framework import routers
-from . import views, statistics, views_new
+from . import views, statistics, views_new, apps
 
 # Routers provide an easy way of automatically determining the URL conf.
-#router = routers.DefaultRouter()
-from rest_framework.routers import DefaultRouter
 from rest_framework_nested.routers import SimpleRouter, NestedSimpleRouter
 
 
@@ -28,8 +25,6 @@ router.register(r'programacion', views_new.ProgramacionViewSet, basename="progra
 
 costos_router = NestedSimpleRouter(router, r'productos', lookup='producto')
 costos_router.register(r'costos', views_new.CostosViewSet, basename='costos')
-
-
 
 urlpatterns = [
     path('', include(router.urls)),
