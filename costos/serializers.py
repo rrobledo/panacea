@@ -42,8 +42,14 @@ class CostosSerializer(serializers.HyperlinkedModelSerializer):
 
 
 class ProgramacionSerializer(serializers.HyperlinkedModelSerializer):
-    producto_nombre = serializers.CharField(source='producto.nombre', required=False, read_only=True)
+    producto_nombre = serializers.SerializerMethodField()
     planeado = serializers.SerializerMethodField()
+
+    def get_producto_nombre(self, obj):
+        if obj.producto:
+            return obj.producto.nombre
+        else:
+            return obj.producto_nombre
 
     def get_planeado(self, obj):
         planificado = None
