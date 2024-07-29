@@ -83,3 +83,26 @@ class Programacion(models.Model):
     s04_viernes_real = models.IntegerField(default=0)
     s04_sabado_plan = models.IntegerField(default=0)
     s04_sabado_real = models.IntegerField(default=0)
+
+
+class Planificacion(models.Model):
+    codigo = models.IntegerField(default=0, primary_key=True)
+    productos = models.CharField(max_length=50)
+    jan2024 = models.IntegerField(default=0)
+    feb2024 = models.IntegerField(default=0)
+    mar2024 = models.IntegerField(default=0)
+    apr2024 = models.IntegerField(default=0)
+    may2024 = models.IntegerField(default=0)
+    may2024corr = models.IntegerField(default=0)
+    jun2024 = models.IntegerField(default=0)
+    jun2024corr = models.IntegerField(default=0)
+    jul2024 = models.IntegerField(default=0)
+    jul2024corr = models.IntegerField(default=0)
+    aug2024 = models.IntegerField(default=0)
+    sep2024 = models.IntegerField(default=0)
+    oct2024 = models.IntegerField(default=0)
+    nov2024 = models.IntegerField(default=0)
+    dec2024 = models.IntegerField(default=0)
+
+    class Meta:
+        db_table = "planificacion2024"
