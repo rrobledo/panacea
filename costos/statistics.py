@@ -870,8 +870,10 @@ def get_planning_2024(request):
                                             then ((agosto::float / julio::float) * (julio_real::float / case when julio_corregido::float > 0 then julio_corregido::float else 1 end) * julio_corregido)::int
                                         when julio_corregido > 0 and julio_corregido >= julio and (julio_real::float / case when julio_corregido::float > 0 then julio_corregido::float else 1 end) >= 0.60
                                             then ((agosto::float / julio::float) * julio_corregido)::int
-                                        when julio_corregido > 0 and julio_corregido < julio and (julio_real::float / case when julio_corregido::float > 0 then julio_corregido::float else 1 end) >= 1
-                                            then ((julio_real::float / case when julio_corregido::float > 0 then julio_corregido::float else 1 end) * agosto)::int
+                                        when julio_corregido > 0 and julio_corregido < julio and (julio_real::float / case when julio_corregido::float > 0 then julio_corregido::float else 1 end) >= 0.60 and julio_real <= agosto
+                                            then agosto
+                                        when julio_corregido > 0 and julio_corregido < julio and (julio_real::float / case when julio_corregido::float > 0 then julio_corregido::float else 1 end) >= 0.60 and julio_real > agosto
+                                            then julio_real
                                         when julio_corregido > 0 and julio_corregido < julio and (julio_real::float / case when julio_corregido::float > 0 then julio_corregido::float else 1 end) < 0.60
                                             then ((julio_real::float / case when julio_corregido::float > 0 then julio_corregido::float else 1 end) * agosto)::int
                                         when julio_corregido = 0 and julio_real > 0 and (julio_real::float / case when julio::float > 0 then julio::float else 1 end) >= 0.40
