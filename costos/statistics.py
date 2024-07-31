@@ -839,37 +839,89 @@ def get_planning_2024(request):
                            and s.product_id = p.codigo
                        )::int diciembre_real
                   from planificacion2024 p 
-                 where p.productos not in ('Total unidades'))
-        select product_id as ref_id,
-              product_name as producto,
-              enero_plan,
-              enero_real,
-              febrero,
-              febrero_real,
-              marzo,
-              marzo_real,
-              abril,
-              abril_real,
-              mayo,
-              mayo_corregido,
-              mayo_real,
-              junio,
-              junio_corregido,
-              junio_real,
-              julio,
-              julio_corregido,
-              julio_real,
-              agosto,
-              agosto_real,
-              septiembre,
-              septiembre_real,
-              octubre,
-              octubre_real,
-              noviembre,
-              noviembre_real,
-              diciembre,
-              diciembre_real
-          from planning
+                 where p.productos not in ('Total unidades')), 
+        planning_total as (
+                select product_id as ref_id,
+                      product_name as producto,
+                      enero_plan,
+                      enero_real,
+                      febrero,
+                      febrero_real,
+                      marzo,
+                      marzo_real,
+                      abril,
+                      abril_real,
+                      mayo,
+                      mayo_corregido,
+                      mayo_real,
+                      junio,
+                      junio_corregido,
+                      junio_real,
+                      julio,
+                      julio_corregido,
+                      julio_real,
+                      agosto,
+                      agosto_real,
+                        case
+                            when agosto::int > 0 and julio > 0
+                                then 
+                                    case 
+                                        when julio_corregido > 0 and julio_corregido >= julio and (julio_real::float / case when julio_corregido::float > 0 then julio_corregido::float else 1 end) > 1 and julio_corregido > agosto and (julio_real::float / case when julio_corregido::float > 0 then julio_corregido::float else 1 end) < 0.60
+                                            then ((agosto::float / julio::float) * (julio_real::float / case when julio_corregido::float > 0 then julio_corregido::float else 1 end) * julio_corregido)::int
+                                        when julio_corregido > 0 and julio_corregido >= julio and (julio_real::float / case when julio_corregido::float > 0 then julio_corregido::float else 1 end) >= 0.60
+                                            then ((agosto::float / julio::float) * julio_corregido)::int
+                                        when julio_corregido > 0 and julio_corregido < julio and (julio_real::float / case when julio_corregido::float > 0 then julio_corregido::float else 1 end) >= 1
+                                            then ((julio_real::float / case when julio_corregido::float > 0 then julio_corregido::float else 1 end) * agosto)::int
+                                        when julio_corregido > 0 and julio_corregido < julio and (julio_real::float / case when julio_corregido::float > 0 then julio_corregido::float else 1 end) < 0.60
+                                            then ((julio_real::float / case when julio_corregido::float > 0 then julio_corregido::float else 1 end) * agosto)::int
+                                        when julio_corregido = 0 and julio_real > 0 and (julio_real::float / case when julio::float > 0 then julio::float else 1 end) >= 0.40
+                                            then agosto
+                                        when julio_corregido = 0 and julio_real > 0 and (julio_real::float / case when julio::float > 0 then julio::float else 1 end) < 0.40
+                                            then ((julio_real::float / case when julio::float > 0 then julio::float else 1 end) * agosto)::int
+                                        else agosto
+                                    end
+                            else 0
+                        end as agosto_corregido,
+                      septiembre,
+                      septiembre_real,
+                      octubre,
+                      octubre_real,
+                      noviembre,
+                      noviembre_real,
+                      diciembre,
+                      diciembre_real
+                  from planning)
+        select ref_id,
+                producto,
+                enero_plan,
+                enero_real,
+                febrero,
+                febrero_real,
+                marzo,
+                marzo_real,
+                abril,
+                abril_real,
+                mayo,
+                mayo_corregido,
+                mayo_real,
+                junio,
+                junio_corregido,
+                junio_real,
+                julio,
+                julio_corregido,
+                julio_real,
+                agosto,
+                agosto_real,
+                agosto_corregido,
+                septiembre,
+                septiembre_real,
+                octubre,
+                octubre_real,
+                noviembre,
+                noviembre_real,
+                diciembre,
+                diciembre_real
+          from planning_total
         union
         select null as ref_id,
               null as producto,
@@ -892,6 +944,7 @@ def get_planning_2024(request):
               sum(julio_real),
               sum(agosto),
               sum(agosto_real),
+              sum(agosto_corregido),      
               sum(septiembre),
               sum(septiembre_real),
               sum(octubre),
@@ -900,7 +953,7 @@ def get_planning_2024(request):
               sum(noviembre_real),
               sum(diciembre),
               sum(diciembre_real)
-          from planning
+          from planning_total
         order by 2;
     """
     with connection.cursor() as cursor:
