@@ -882,6 +882,8 @@ def get_planning_2024(request):
                                             then agosto
                                         when julio_corregido = 0 and julio_real > 0 and (julio_real::float / case when julio::float > 0 then julio::float else 1 end) < 0.40
                                             then ((julio_real::float / case when julio::float > 0 then julio::float else 1 end) * agosto)::int
+                                        when julio_corregido = 0 and julio_real = 0
+                                            then 0
                                         else agosto
                                     end
                             else 0
