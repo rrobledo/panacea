@@ -866,7 +866,9 @@ def get_planning_2024(request):
                             when agosto::int > 0 and julio > 0
                                 then 
                                     case 
-                                        when julio_corregido > 0 and julio_corregido >= julio and (julio_real::float / case when julio_corregido::float > 0 then julio_corregido::float else 1 end) > 1 and julio_corregido > agosto and (julio_real::float / case when julio_corregido::float > 0 then julio_corregido::float else 1 end) < 0.60
+                                        when julio_corregido > 0 and julio_corregido >= julio and (julio_real::float / case when julio_corregido::float > 0 then julio_corregido::float else 1 end) > 1 and julio_corregido > agosto
+                                            then ((agosto::float / julio::float) * (julio_real::float / case when julio_corregido::float > 0 then julio_corregido::float else 1 end) * julio_corregido)::int
+                                        when julio_corregido > 0 and julio_corregido >= julio and (julio_real::float / case when julio_corregido::float > 0 then julio_corregido::float else 1 end) < 0.60 and julio_corregido > agosto
                                             then ((agosto::float / julio::float) * (julio_real::float / case when julio_corregido::float > 0 then julio_corregido::float else 1 end) * julio_corregido)::int
                                         when julio_corregido > 0 and julio_corregido >= julio and (julio_real::float / case when julio_corregido::float > 0 then julio_corregido::float else 1 end) >= 0.60
                                             then ((agosto::float / julio::float) * julio_corregido)::int
