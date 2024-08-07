@@ -29,6 +29,45 @@ class Costos(models.Model):
     cantidad = models.IntegerField()
 
 
+class Clientes(models.Model):
+    id = models.IntegerField(db_column="idcliente", unique=True, primary_key=True)
+    nom1 = models.CharField(db_column="nom1")
+    nom2 = models.CharField(db_column="nom2")
+
+    @property
+    def nombre(self):
+        return f'{self.nom1}, {self.nom2}'
+
+    class Meta:
+        db_table = "clientes"
+        managed = False
+
+
+class Remitos(models.Model):
+    id = models.AutoField(primary_key=True)
+    cliente = models.ForeignKey(Clientes, on_delete=models.RESTRICT)
+    observaciones = models.CharField(max_length=1000, null=True)
+    vendedor = models.CharField(max_length=255)
+
+    fecha_carga = models.DateTimeField(auto_now=True)
+    fecha_entrega = models.DateTimeField()
+    fecha_preparacion = models.DateTimeField(null=True)
+    fecha_listo = models.DateTimeField(null=True)
+    fecha_despacho = models.DateTimeField(null=True)
+    fecha_recibido = models.DateTimeField(null=True)
+    fecha_facturacion = models.DateTimeField(null=True)
+
+
+class RemitoDetalles(models.Model):
+    id = models.AutoField(primary_key=True)
+    remito = models.ForeignKey(Remitos, on_delete=models.RESTRICT)
+    producto = models.ForeignKey(Productos, on_delete=models.RESTRICT)
+    cantidad = models.IntegerField()
+    entregado = models.IntegerField()
+    observaciones = models.CharField(max_length=1000, null=True)
+
+
+
 class Programacion(models.Model):
     id = models.AutoField(primary_key=True)
     year = models.IntegerField()
@@ -107,3 +146,4 @@ class Planificacion(models.Model):
 
     class Meta:
         db_table = "planificacion2024"
+        managed = False

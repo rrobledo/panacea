@@ -1,4 +1,4 @@
-from .models import Insumos, Productos, Costos, Programacion, Planificacion
+from .models import Insumos, Productos, Costos, Programacion, Planificacion, Clientes, Remitos, RemitoDetalles
 from rest_framework import serializers
 from django.urls import reverse
 
@@ -39,6 +39,42 @@ class CostosSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Costos
         fields = ["id", "producto", "insumo", 'insumo_nombre', "insumo_unidad_medida", "cantidad"]
+
+
+class ClientesSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = Clientes
+        fields = ["id", "nombre"]
+
+
+class RemitosSerializer(serializers.HyperlinkedModelSerializer):
+    estado = serializers.SerializerMethodField()
+    cliente_id = serializers.CharField(source='cliente.id', required=False, read_only=True)
+    cliente_nombre = serializers.CharField(source='cliente.nombre', required=False, read_only=True)
+
+    def get_estado(self, obj):
+        if obj.fecha_recibido:
+            return "ENTREGADO"
+        if obj.fecha_despacho:
+            return "EN CAMINO"
+        if obj.fecha_listo:
+            return "PREPARADO"
+        if obj.fecha_preparacion:
+            return "EN_PREPARACION"
+        if obj.fecha_preparacion:
+            return "EN_PREPARACION"
+        if obj.fecha_preparacion:
+            return "PENDIENTE"
+
+    class Meta:
+        model = Remitos
+        fields = ["id", "cliente_id", "cliente_nombre", "cliente", "estado", "observaciones", "vendedor", "fecha_carga", "fecha_entrega", "fecha_preparacion", "fecha_listo", "fecha_despacho", "fecha_recibido", "fecha_facturacion"]
+
+
+class RemitoDetallesSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = Remitos
+        fields = ["id", "remito", "producto", "cantidad", "entregado", "observaciones"]
 
 
 class ProgramacionSerializer(serializers.HyperlinkedModelSerializer):

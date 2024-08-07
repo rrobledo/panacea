@@ -21,6 +21,8 @@ def get_categories(request):
 router = OptionalSlashRouter()
 router.register(r'insumos', views_new.InsumosViewSet)
 router.register(r'productos', views_new.ProductosViewSet)
+router.register(r'clientes', views_new.ClientesViewSet)
+router.register(r'remitos', views_new.RemitosViewSet)
 router.register(r'programacion', views_new.ProgramacionViewSet, basename="programacion")
 
 costos_router = NestedSimpleRouter(router, r'productos', lookup='producto')
