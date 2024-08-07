@@ -63,7 +63,7 @@ class RemitosSerializer(serializers.HyperlinkedModelSerializer):
             return "EN_PREPARACION"
         if obj.fecha_preparacion:
             return "EN_PREPARACION"
-        if obj.fecha_preparacion:
+        else:
             return "PENDIENTE"
 
     class Meta:
