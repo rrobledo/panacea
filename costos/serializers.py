@@ -42,9 +42,17 @@ class CostosSerializer(serializers.HyperlinkedModelSerializer):
 
 
 class ClientesSerializer(serializers.HyperlinkedModelSerializer):
+    absolute_url = serializers.SerializerMethodField()
+
+    def get_absolute_url(self, obj):
+        request = self.context.get('request')
+        base_url = f"{request.scheme}://{request.get_host()}"
+        absolute_url = reverse('clientes-detail', args=[str(obj.id)])
+        return f"{base_url}{absolute_url}"
+
     class Meta:
         model = Clientes
-        fields = ["id", "nombre"]
+        fields = ["absolute_url", "id", "nombre"]
 
 
 class RemitosSerializer(serializers.HyperlinkedModelSerializer):
