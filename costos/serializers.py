@@ -56,9 +56,12 @@ class ClientesSerializer(serializers.HyperlinkedModelSerializer):
 
 
 class RemitoDetallesSerializer(serializers.HyperlinkedModelSerializer):
+    producto_id = serializers.CharField(source='producto.id', required=False, read_only=True)
+    producto_nombre = serializers.CharField(source='producto.nombre', required=False, read_only=True)
+
     class Meta:
         model = RemitoDetalles
-        fields = ["id", "remito", "producto", "cantidad", "entregado", "observaciones"]
+        fields = ["id", "remito", "producto", "producto_id", "producto_nombre" , "cantidad", "entregado", "observaciones"]
 
 
 class RemitosSerializer(serializers.HyperlinkedModelSerializer):
