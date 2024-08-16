@@ -55,10 +55,17 @@ class ClientesSerializer(serializers.HyperlinkedModelSerializer):
         fields = ["absolute_url", "id", "nombre"]
 
 
+class RemitoDetallesSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = RemitoDetalles
+        fields = ["id", "remito", "producto", "cantidad", "entregado", "observaciones"]
+
+
 class RemitosSerializer(serializers.HyperlinkedModelSerializer):
     estado = serializers.SerializerMethodField()
     cliente_id = serializers.CharField(source='cliente.id', required=False, read_only=True)
     cliente_nombre = serializers.CharField(source='cliente.nombre', required=False, read_only=True)
+    productos = RemitoDetallesSerializer(many=True)
 
     def get_estado(self, obj):
         if obj.fecha_recibido:
@@ -76,14 +83,15 @@ class RemitosSerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
         model = Remitos
-        fields = ["id", "cliente_id", "cliente_nombre", "cliente", "estado", "observaciones", "vendedor", "fecha_carga", "fecha_entrega", "fecha_preparacion", "fecha_listo", "fecha_despacho", "fecha_recibido", "fecha_facturacion"]
+        fields = ["id", "cliente_id", "cliente_nombre", "cliente", "estado", "observaciones", "vendedor", "fecha_carga", "fecha_entrega", "fecha_preparacion", "fecha_listo", "fecha_despacho", "fecha_recibido", "fecha_facturacion", "productos"]
 
 
-class RemitoDetallesSerializer(serializers.HyperlinkedModelSerializer):
-    class Meta:
-        model = Remitos
-        fields = ["id", "remito", "producto", "cantidad", "entregado", "observaciones"]
-
+    def create(self, validated_data):
+        productos_data = validated_data.pop('productos')
+        remito = Remitos.objects.create(**validated_data)
+        for producto_data in productos_data:
+            RemitoDetalles.objects.create(remito=remito, **producto_data)
+        return remito
 
 class ProgramacionSerializer(serializers.HyperlinkedModelSerializer):
     producto_nombre = serializers.SerializerMethodField()

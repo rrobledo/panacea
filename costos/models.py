@@ -60,10 +60,10 @@ class Remitos(models.Model):
 
 class RemitoDetalles(models.Model):
     id = models.AutoField(primary_key=True)
-    remito = models.ForeignKey(Remitos, on_delete=models.RESTRICT)
+    remito = models.ForeignKey(Remitos, related_name='productos', on_delete=models.RESTRICT, null=True)
     producto = models.ForeignKey(Productos, on_delete=models.RESTRICT)
     cantidad = models.IntegerField()
-    entregado = models.IntegerField()
+    entregado = models.IntegerField(null=True)
     observaciones = models.CharField(max_length=1000, null=True)
 
 

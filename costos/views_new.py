@@ -6,6 +6,7 @@ from rest_framework import filters
 from rest_framework.response import Response
 from rest_framework import status
 from django.db.models import Q
+from django.db import transaction, IntegrityError
 
 
 # ViewSets define the view behavior.
@@ -89,6 +90,27 @@ class RemitosViewSet(viewsets.ModelViewSet):
             queryset = queryset.filter(estado=estado)
         return queryset
 
+    # def post(self, request, *args, **kwargs):
+    #     return Response(status=status.HTTP_200_OK)
+    #
+    # def create(self, request, *args, **kwargs):
+    #     serializer = self.get_serializer(data=request.data)
+    #     serializer.is_valid(raise_exception=True)
+    #     remito_data = serializer.validated_data
+    #     productos = remito_data.get("productos")
+    #     del remito_data["productos"]
+    #     remito = Remitos(**remito_data)
+    #     try:
+    #         with transaction.atomic():
+    #             remito.save()
+    #             for item_data in productos:
+    #                 item_data["remito"] = remito
+    #                 remito_detalle = RemitoDetalles(**item_data)
+    #                 remito_detalle.save()
+    #     except IntegrityError as e:
+    #         return Response(e.args, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    #     headers = self.get_success_headers(serializer.data)
+    #     return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
 class ProgramacionViewSet(viewsets.ModelViewSet):
     serializer_class = ProgramacionSerializer
