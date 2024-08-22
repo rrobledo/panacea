@@ -757,208 +757,263 @@ def get_planning_2024(request):
                          where s.operation_year = 2024
                            and s.operation_month = 1
                            and s.product_id = p.codigo
-                         )::int enero_real,
+                         )::int enero_venta,
                        feb2024 as febrero,
                        (select coalesce(sum(count), 0)
                           from panacea_sales s
                          where s.operation_year = 2024
                            and s.operation_month = 2
                            and s.product_id = p.codigo
-                         )::int febrero_real, 
+                         )::int febrero_venta, 
                        mar2024 as marzo,
                        (select coalesce(sum(count), 0)
                           from panacea_sales s
                          where s.operation_year = 2024
                            and s.operation_month = 3
                            and s.product_id = p.codigo
-                         )::int marzo_real, 
+                         )::int marzo_venta, 
                        apr2024 as abril,
+                       (select coalesce(sum(prod), 0)
+                          from costos_programacion s
+                            join costos_productos cp
+                              on s.producto_id = cp.id
+                         where extract(year from s.fecha) = 2024
+                           and extract(month from s.fecha) = 4
+                           and cp.ref_id::int = p.codigo
+                       )::int abril_prod,
                        (select coalesce(sum(count), 0)
                           from panacea_sales s
                          where s.operation_year = 2024
                            and s.operation_month = 4
                            and s.product_id = p.codigo
-                         )::int abril_real,
+                         )::int abril_venta,
                        may2024 as mayo,
                        may2024corr as mayo_corregido,
+                       (select coalesce(sum(prod), 0)
+                          from costos_programacion s
+                            join costos_productos cp
+                              on s.producto_id = cp.id
+                         where extract(year from s.fecha) = 2024
+                           and extract(month from s.fecha) = 5
+                           and cp.ref_id::int = p.codigo
+                       )::int mayo_prod,
                        (select coalesce(sum(count), 0)
                           from panacea_sales s
                          where s.operation_year = 2024
                            and s.operation_month = 5
                            and s.product_id = p.codigo
-                       )::int mayo_real,
+                       )::int mayo_venta,
                        jun2024 as junio,
                        jun2024corr as junio_corregido,
+                       (select coalesce(sum(prod), 0)
+                          from costos_programacion s
+                            join costos_productos cp
+                              on s.producto_id = cp.id
+                         where extract(year from s.fecha) = 2024
+                           and extract(month from s.fecha) = 6
+                           and cp.ref_id::int = p.codigo
+                       )::int junio_prod,
                        (select coalesce(sum(count), 0)
                           from panacea_sales s
                          where s.operation_year = 2024
                            and s.operation_month = 6
                            and s.product_id = p.codigo
-                       )::int junio_real,
+                       )::int junio_venta,
                        jul2024 as julio,
                        jul2024corr as julio_corregido,
+                       (select coalesce(sum(prod), 0)
+                          from costos_programacion s
+                            join costos_productos cp
+                              on s.producto_id = cp.id
+                         where extract(year from s.fecha) = 2024
+                           and extract(month from s.fecha) = 7
+                           and cp.ref_id::int = p.codigo
+                       )::int julio_prod,
                        (select coalesce(sum(count), 0)
                           from panacea_sales s
                          where s.operation_year = 2024
                            and s.operation_month = 7
                            and s.product_id = p.codigo
-                       )::int julio_real,
+                       )::int julio_venta,
                        aug2024 as agosto,
+                       (select coalesce(sum(prod), 0)
+                          from costos_programacion s
+                            join costos_productos cp
+                              on s.producto_id = cp.id
+                         where extract(year from s.fecha) = 2024
+                           and extract(month from s.fecha) = 8
+                           and cp.ref_id::int = p.codigo
+                       )::int agosto_prod,
                        (select coalesce(sum(count), 0)
                           from panacea_sales s
                          where s.operation_year = 2024
                            and s.operation_month = 8
                            and s.product_id = p.codigo
-                       )::int agosto_real,
+                       )::int agosto_venta,
                        sep2024 as septiembre,
                        (select coalesce(sum(count), 0)
                           from panacea_sales s
                          where s.operation_year = 2024
                            and s.operation_month = 9
                            and s.product_id = p.codigo
-                       )::int septiembre_real,
+                       )::int septiembre_venta,
                        oct2024 as octubre,
                        (select coalesce(sum(count), 0)
                           from panacea_sales s
                          where s.operation_year = 2024
                            and s.operation_month = 10
                            and s.product_id = p.codigo
-                       )::int octubre_real,
+                       )::int octubre_venta,
                        nov2024 as noviembre,
                        (select coalesce(sum(count), 0)
                           from panacea_sales s
                          where s.operation_year = 2024
                            and s.operation_month = 11
                            and s.product_id = p.codigo
-                       )::int noviembre_real,
+                       )::int noviembre_venta,
                        dec2024 as diciembre,
                        (select coalesce(sum(count), 0)
                           from panacea_sales s
                          where s.operation_year = 2024
                            and s.operation_month = 12
                            and s.product_id = p.codigo
-                       )::int diciembre_real
+                       )::int diciembre_venta
                   from planificacion2024 p 
                  where p.productos not in ('Total unidades')), 
         planning_total as (
                 select product_id as ref_id,
                       product_name as producto,
                       enero_plan,
-                      enero_real,
+                      enero_venta,
                       febrero,
-                      febrero_real,
+                      febrero_venta,
                       marzo,
-                      marzo_real,
+                      marzo_venta,
                       abril,
-                      abril_real,
+                      abril_prod,
+                      abril_venta,
                       mayo,
                       mayo_corregido,
-                      mayo_real,
+                      mayo_prod,
+                      mayo_venta,
                       junio,
                       junio_corregido,
-                      junio_real,
+                      junio_prod,
+                      junio_venta,
                       julio,
                       julio_corregido,
-                      julio_real,
+                      julio_venta,
+                      julio_prod,
                       agosto,
-                      agosto_real,
+                      agosto_prod,
+                      agosto_venta,
                         case
                             when agosto::int > 0 and julio > 0
                                 then 
                                     case 
-                                        when julio_corregido > 0 and julio_corregido >= julio and (julio_real::float / case when julio_corregido::float > 0 then julio_corregido::float else 1 end) > 1 and julio_corregido > agosto
-                                            then ((agosto::float / julio::float) * (julio_real::float / case when julio_corregido::float > 0 then julio_corregido::float else 1 end) * julio_corregido)::int
-                                        when julio_corregido > 0 and julio_corregido >= julio and (julio_real::float / case when julio_corregido::float > 0 then julio_corregido::float else 1 end) < 0.60 and julio_corregido > agosto
-                                            then ((agosto::float / julio::float) * (julio_real::float / case when julio_corregido::float > 0 then julio_corregido::float else 1 end) * julio_corregido)::int
-                                        when julio_corregido > 0 and julio_corregido >= julio and (julio_real::float / case when julio_corregido::float > 0 then julio_corregido::float else 1 end) >= 0.60
+                                        when julio_corregido > 0 and julio_corregido >= julio and (julio_venta::float / case when julio_corregido::float > 0 then julio_corregido::float else 1 end) > 1 and julio_corregido > agosto
+                                            then ((agosto::float / julio::float) * (julio_venta::float / case when julio_corregido::float > 0 then julio_corregido::float else 1 end) * julio_corregido)::int
+                                        when julio_corregido > 0 and julio_corregido >= julio and (julio_venta::float / case when julio_corregido::float > 0 then julio_corregido::float else 1 end) < 0.60 and julio_corregido > agosto
+                                            then ((agosto::float / julio::float) * (julio_venta::float / case when julio_corregido::float > 0 then julio_corregido::float else 1 end) * julio_corregido)::int
+                                        when julio_corregido > 0 and julio_corregido >= julio and (julio_venta::float / case when julio_corregido::float > 0 then julio_corregido::float else 1 end) >= 0.60
                                             then ((agosto::float / julio::float) * julio_corregido)::int
-                                        when julio_corregido > 0 and julio_corregido < julio and (julio_real::float / case when julio_corregido::float > 0 then julio_corregido::float else 1 end) >= 0.80 and julio_real <= agosto
+                                        when julio_corregido > 0 and julio_corregido < julio and (julio_venta::float / case when julio_corregido::float > 0 then julio_corregido::float else 1 end) >= 0.80 and julio_venta <= agosto
                                             then agosto
-                                        when julio_corregido > 0 and julio_corregido < julio and (julio_real::float / case when julio_corregido::float > 0 then julio_corregido::float else 1 end) >= 0.80 and julio_real > agosto
-                                            then julio_real
-                                        when julio_corregido > 0 and julio_corregido < julio and (julio_real::float / case when julio_corregido::float > 0 then julio_corregido::float else 1 end) < 0.80
-                                            then ((julio_real::float / case when julio_corregido::float > 0 then julio_corregido::float else 1 end) * agosto)::int
-                                        when julio_corregido = 0 and julio_real > 0 and (julio_real::float / case when julio::float > 0 then julio::float else 1 end) >= 0.40
+                                        when julio_corregido > 0 and julio_corregido < julio and (julio_venta::float / case when julio_corregido::float > 0 then julio_corregido::float else 1 end) >= 0.80 and julio_venta > agosto
+                                            then julio_venta
+                                        when julio_corregido > 0 and julio_corregido < julio and (julio_venta::float / case when julio_corregido::float > 0 then julio_corregido::float else 1 end) < 0.80
+                                            then ((julio_venta::float / case when julio_corregido::float > 0 then julio_corregido::float else 1 end) * agosto)::int
+                                        when julio_corregido = 0 and julio_venta > 0 and (julio_venta::float / case when julio::float > 0 then julio::float else 1 end) >= 0.40
                                             then agosto
-                                        when julio_corregido = 0 and julio_real > 0 and (julio_real::float / case when julio::float > 0 then julio::float else 1 end) < 0.40
-                                            then ((julio_real::float / case when julio::float > 0 then julio::float else 1 end) * agosto)::int
-                                        when julio_corregido = 0 and julio_real = 0
+                                        when julio_corregido = 0 and julio_venta > 0 and (julio_venta::float / case when julio::float > 0 then julio::float else 1 end) < 0.40
+                                            then ((julio_venta::float / case when julio::float > 0 then julio::float else 1 end) * agosto)::int
+                                        when julio_corregido = 0 and julio_venta = 0
                                             then 0
                                         else agosto
                                     end
                             else 0
                         end as agosto_corregido,
                       septiembre,
-                      septiembre_real,
+                      septiembre_venta,
                       octubre,
-                      octubre_real,
+                      octubre_venta,
                       noviembre,
-                      noviembre_real,
+                      noviembre_venta,
                       diciembre,
-                      diciembre_real
+                      diciembre_venta
                   from planning)
         select ref_id,
                 producto,
                 enero_plan,
-                enero_real,
+                enero_venta,
                 febrero,
-                febrero_real,
+                febrero_venta,
                 marzo,
-                marzo_real,
+                marzo_venta,
                 abril,
-                abril_real,
+                abril_prod,
+                abril_venta,
                 mayo,
                 mayo_corregido,
-                mayo_real,
+                mayo_prod,
+                mayo_venta,
                 junio,
                 junio_corregido,
-                junio_real,
+                junio_prod,
+                junio_venta,
                 julio,
                 julio_corregido,
-                julio_real,
+                julio_prod,
+                julio_venta,
                 agosto,
-                agosto_real,
+                agosto_prod,
+                agosto_venta,
                 agosto_corregido,
                 septiembre,
-                septiembre_real,
+                septiembre_venta,
                 octubre,
-                octubre_real,
+                octubre_venta,
                 noviembre,
-                noviembre_real,
+                noviembre_venta,
                 diciembre,
-                diciembre_real
+                diciembre_venta
           from planning_total
         union
         select null as ref_id,
               null as producto,
               sum(enero_plan),
-              sum(enero_real),
+              sum(enero_venta),
               sum(febrero),
-              sum(febrero_real),
+              sum(febrero_venta),
               sum(marzo),
-              sum(marzo_real),
+              sum(marzo_venta),
               sum(abril),
-              sum(abril_real),
+              sum(abril_prod),
+              sum(abril_venta),
               sum(mayo),
               sum(mayo_corregido),
-              sum(mayo_real),
+              sum(mayo_prod),
+              sum(mayo_venta),
               sum(junio),
               sum(junio_corregido),
-              sum(junio_real),
+              sum(junio_prod),
+              sum(junio_venta),
               sum(julio),
               sum(julio_corregido),
-              sum(julio_real),
+              sum(julio_prod),
+              sum(julio_venta),
               sum(agosto),
-              sum(agosto_real),
+              sum(agosto_prod),
+              sum(agosto_venta),
               sum(agosto_corregido),      
               sum(septiembre),
-              sum(septiembre_real),
+              sum(septiembre_venta),
               sum(octubre),
-              sum(octubre_real),
+              sum(octubre_venta),
               sum(noviembre),
-              sum(noviembre_real),
+              sum(noviembre_venta),
               sum(diciembre),
-              sum(diciembre_real)
+              sum(diciembre_venta)
           from planning_total
         order by 2;
     """
