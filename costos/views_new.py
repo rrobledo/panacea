@@ -134,18 +134,17 @@ class ProgramacionViewSet(viewsets.ViewSet):
             return JsonResponse(res, safe=False)
 
         def create(self, request):
-            pass
+            produccion.update_programacion(request.data)
+            return Response(status=status.HTTP_204_NO_CONTENT)
 
         def retrieve(self, request, pk=None):
             pass
 
         def update(self, request, pk=None):
-            produccion.update_programacion(request.data)
-            return Response(status=status.HTTP_204_NO_CONTENT)
+            pass
 
         def partial_update(self, request, pk=None):
-            produccion.update_programacion(request.data)
-            return Response(status=status.HTTP_204_NO_CONTENT)
+            pass
 
         def destroy(self, request, pk=None):
             pass
