@@ -1,6 +1,6 @@
 from django.urls import path, include
 from django.http import JsonResponse
-from . import views, statistics, views_new, apps
+from . import views, statistics, views_new, apps, produccion
 
 # Routers provide an easy way of automatically determining the URL conf.
 from rest_framework_nested.routers import SimpleRouter, NestedSimpleRouter
@@ -38,5 +38,6 @@ urlpatterns = [
     path('products/<str:product_code>/cronograma', statistics.get_product_cronograma, name='get_product_cronograma'),
     path('cronograma/<int:week_of_month>', statistics.get_cronograma_by_week_of_month, name='get_cronograma_by_week_of_month'),
     path('planning', statistics.get_planning, name='get_planning'),
+    path('programacion_columnas', produccion.get_programacion_columns, name='programacion_columnas'),
     path('categorias', get_categories),
 ]

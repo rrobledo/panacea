@@ -7,6 +7,8 @@ from rest_framework.response import Response
 from rest_framework import status
 from django.db.models import Q
 from django.db import transaction, IntegrityError
+from . import produccion
+from django.http import JsonResponse, HttpResponse
 
 
 # ViewSets define the view behavior.
@@ -91,28 +93,58 @@ class RemitosViewSet(viewsets.ModelViewSet):
         return queryset
 
 
-class ProgramacionViewSet(viewsets.ModelViewSet):
-    serializer_class = ProgramacionSerializer
+# class ProgramacionViewSet(viewsets.ModelViewSet):
+#     serializer_class = ProgramacionSerializer
+#
+#     def get_queryset(self):
+#         """
+#         Optionally restricts the returned purchases to a given cost,
+#         by filtering against a `cost` query parameter in the URL.
+#         """
+#         queryset = Programacion.objects.order_by("producto__nombre").all()
+#         responsable = self.request.query_params.get('responsable')
+#         if responsable is not None:
+#             if responsable != "Todos":
+#                 queryset = queryset.filter(responsable=responsable)
+#         return queryset
+#
+#     def partial_update(self, request, pk=None):
+#         if isinstance(request.data, list):
+#             for item in request.data:
+#                 instance = Programacion.objects.get(id=item.get("id"))
+#                 serializer = self.get_serializer(instance, data=item, partial=True)
+#                 serializer.is_valid(raise_exception=True)
+#                 self.perform_update(serializer)
+#         else:
+#             return super().partial_update(request.data, pk=pk)
+#         return Response(status=status.HTTP_200_OK)
 
-    def get_queryset(self):
-        """
-        Optionally restricts the returned purchases to a given cost,
-        by filtering against a `cost` query parameter in the URL.
-        """
-        queryset = Programacion.objects.order_by("producto__nombre").all()
-        responsable = self.request.query_params.get('responsable')
-        if responsable is not None:
-            if responsable != "Todos":
-                queryset = queryset.filter(responsable=responsable)
-        return queryset
 
-    def partial_update(self, request, pk=None):
-        if isinstance(request.data, list):
-            for item in request.data:
-                instance = Programacion.objects.get(id=item.get("id"))
-                serializer = self.get_serializer(instance, data=item, partial=True)
-                serializer.is_valid(raise_exception=True)
-                self.perform_update(serializer)
-        else:
-            return super().partial_update(request.data, pk=pk)
-        return Response(status=status.HTTP_200_OK)
+class ProgramacionViewSet(viewsets.ViewSet):
+        """
+        Example empty viewset demonstrating the standard
+        actions that will be handled by a router class.
+
+        If you're using format suffixes, make sure to also include
+        the `format=None` keyword argument for each action.
+        """
+
+        def list(self, request):
+            res = produccion.get_programacion(request)
+            return JsonResponse(res, safe=False)
+
+        def create(self, request):
+            produccion.update_programacion(request.data)
+            return Response(status=status.HTTP_204_NO_CONTENT)
+
+        def retrieve(self, request, pk=None):
+            pass
+
+        def update(self, request, pk=None):
+            pass
+
+        def partial_update(self, request, pk=None):
+            pass
+
+        def destroy(self, request, pk=None):
+            pass
