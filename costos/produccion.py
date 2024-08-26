@@ -60,7 +60,7 @@ def update_programacion(data: []):
     pass
 
 
-def get_programacion_columns(request):
+def get_programacion_columns(request, mes):
     sql = f"""
         select distinct extract('week' from fecha) - extract('week' from '2024-07-01'::date) + 1 as semana,
                case 
@@ -74,7 +74,7 @@ def get_programacion_columns(request):
                 to_char(fecha, 'YYYYMMDD') as codigo,
                 extract(dow from fecha::date)
           from costos_programacion cp
-         where extract(month from fecha) = 7
+         where extract(month from fecha) = {mes}
          order by codigo;
     """
     with connection.cursor() as cursor:
