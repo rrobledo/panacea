@@ -19,7 +19,7 @@ def get_programacion(request, mes = 7, responsable = None):
             join planificacion2024 p
                 on p.codigo = pr.ref_id::int
          where extract(month from fecha) = {mes}
-         order by producto_nombre;
+         order by producto_nombre, codigo;
     """
     with connection.cursor() as cursor:
         cursor.execute(sql)
