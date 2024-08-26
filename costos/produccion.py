@@ -4,7 +4,7 @@ import itertools
 from .models import Programacion
 from datetime import datetime
 
-def get_programacion(request):
+def get_programacion(request, mes = 7, responsable = None):
     sql = f"""
          select cp.producto_id as id,
                 cp.producto_nombre as producto_nombre,
@@ -18,7 +18,7 @@ def get_programacion(request):
               on pr.id = cp.producto_id
             join planificacion2024 p
                 on p.codigo = pr.ref_id::int
-         where extract(month from fecha) = 7
+         where extract(month from fecha) = {mes}
          order by producto_nombre;
     """
     with connection.cursor() as cursor:

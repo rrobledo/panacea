@@ -130,7 +130,11 @@ class ProgramacionViewSet(viewsets.ViewSet):
         """
 
         def list(self, request):
-            res = produccion.get_programacion(request)
+            mes = self.request.query_params.get('mes')
+            if mes is None:
+                mes = 7
+            responsable = self.request.query_params.get('responsable')
+            res = produccion.get_programacion(request, mes, responsable)
             return JsonResponse(res, safe=False)
 
         def create(self, request):
