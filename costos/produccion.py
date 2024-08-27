@@ -60,7 +60,8 @@ def update_programacion(data: []):
     pass
 
 
-def get_programacion_columns(request, mes):
+def get_programacion_columns(request):
+    mes = self.request.query_params.get('mes')
     sql = f"""
         select distinct extract('week' from fecha) - extract('week' from '2024-07-01'::date) + 1 as semana,
                case 
