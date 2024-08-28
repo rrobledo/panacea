@@ -7,7 +7,7 @@ from datetime import datetime
 def get_programacion(request, mes = 7, responsable = None):
     sql = f"""
          select cp.producto_id as id,
-                cp.producto_nombre as producto_nombre,
+                case when pr.nombre is null then cp.producto_nombre else pr.nombre end as producto_nombre,
                 p.jul2024corr as planeado,
                 cp.responsable,
                 to_char(fecha, 'YYYYMMDD') as codigo,
@@ -18,7 +18,7 @@ def get_programacion(request, mes = 7, responsable = None):
               on pr.id = cp.producto_id
             join planificacion2024 p
                 on p.codigo = pr.ref_id::int
-         where extract(month from fecha) = {mes}
+         where extract(month from fecha) = 7
          order by producto_nombre, codigo;
     """
     with connection.cursor() as cursor:
