@@ -5,6 +5,10 @@ from .models import Programacion
 from datetime import datetime
 
 def get_programacion(request, mes = 7, responsable = None):
+    condition = ""
+    if responsable is not None:
+        condition = f" and cp.responsable = '{responsable}'"
+
     sql = f"""
          select cp.producto_id as id,
                 case when pr.nombre is null then cp.producto_nombre else pr.nombre end as producto_nombre,
@@ -26,6 +30,7 @@ def get_programacion(request, mes = 7, responsable = None):
             join planificacion2024 p
                 on p.codigo = pr.ref_id::int
          where extract(month from fecha) = {mes}
+         {condition}
          order by producto_nombre, codigo;
     """
     with connection.cursor() as cursor:
