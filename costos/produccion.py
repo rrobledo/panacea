@@ -6,7 +6,7 @@ from datetime import datetime
 
 def get_programacion(request, mes = 7, responsable = None):
     condition = ""
-    if responsable is not None:
+    if responsable is not None and responsable != "Todos":
         condition = f" and cp.responsable = '{responsable}'"
 
     sql = f"""
