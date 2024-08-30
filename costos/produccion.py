@@ -8,7 +8,14 @@ def get_programacion(request, mes = 7, responsable = None):
     sql = f"""
          select cp.producto_id as id,
                 case when pr.nombre is null then cp.producto_nombre else pr.nombre end as producto_nombre,
-                p.jul2024corr as planeado,
+                case
+                    when extract(month from fecha) = 4 then p.apr024
+                    when extract(month from fecha) = 5 then p.may2024corr
+                    when extract(month from fecha) = 6 then p.jun2024corr
+                    when extract(month from fecha) = 7 then p.jul2024corr
+                    when extract(month from fecha) = 8 then p.aug2024corr
+                    when extract(month from fecha) = 9 then p.sep2024corr
+                end as planeado,
                 cp.responsable,
                 to_char(fecha, 'YYYYMMDD') as codigo,
                 cp.plan,
@@ -18,7 +25,7 @@ def get_programacion(request, mes = 7, responsable = None):
               on pr.id = cp.producto_id
             join planificacion2024 p
                 on p.codigo = pr.ref_id::int
-         where extract(month from fecha) = 7
+         where extract(month from fecha) = {mes}
          order by producto_nombre, codigo;
     """
     with connection.cursor() as cursor:
