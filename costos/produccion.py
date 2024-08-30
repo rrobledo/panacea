@@ -9,7 +9,7 @@ def get_programacion(request, mes = 7, responsable = None):
          select cp.producto_id as id,
                 case when pr.nombre is null then cp.producto_nombre else pr.nombre end as producto_nombre,
                 case
-                    when extract(month from fecha) = 4 then p.apr024
+                    when extract(month from fecha) = 4 then p.apr2024
                     when extract(month from fecha) = 5 then p.may2024corr
                     when extract(month from fecha) = 6 then p.jun2024corr
                     when extract(month from fecha) = 7 then p.jul2024corr
