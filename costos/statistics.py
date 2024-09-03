@@ -852,6 +852,15 @@ def get_planning_2024(request):
                                and s.product_id = p.codigo
                            )::int agosto_venta,
                            sep2024 as septiembre,
+                           sep2024corr as septiembre_corregido,
+                           (select coalesce(sum(prod), 0)
+                              from costos_programacion s
+                                join costos_productos cp
+                                  on s.producto_id = cp.id
+                             where extract(year from s.fecha) = 2024
+                               and extract(month from s.fecha) = 9
+                               and cp.ref_id::int = p.codigo
+                           )::int septiembre_prod,
                            (select coalesce(sum(count), 0)
                               from panacea_sales s
                              where s.operation_year = 2024
@@ -912,6 +921,8 @@ def get_planning_2024(request):
                           agosto_venta,
                           agosto_corregido,
                           septiembre,
+                          septiembre_corregido,
+                          septiembre_prod,
                           septiembre_venta,
                           octubre,
                           octubre_venta,
@@ -948,6 +959,8 @@ def get_planning_2024(request):
                     agosto_venta,
                     agosto_corregido,
                     septiembre,
+                    septiembre_corregido,
+                    septiembre_prod,
                     septiembre_venta,
                     octubre,
                     octubre_venta,
@@ -985,6 +998,8 @@ def get_planning_2024(request):
                   sum(agosto_venta),
                   sum(agosto_corregido),      
                   sum(septiembre),
+                  sum(septiembre_corregido),
+                  sum(septiembre_prod),
                   sum(septiembre_venta),
                   sum(octubre),
                   sum(octubre_venta),
