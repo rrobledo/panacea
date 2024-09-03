@@ -836,6 +836,7 @@ def get_planning_2024(request):
                                and s.product_id = p.codigo
                            )::int julio_venta,
                            aug2024 as agosto,
+                           aug2024corr as agosto_corregido,
                            (select coalesce(sum(prod), 0)
                               from costos_programacion s
                                 join costos_productos cp
@@ -909,32 +910,7 @@ def get_planning_2024(request):
                           agosto,
                           agosto_prod,
                           agosto_venta,
-                            case
-                                when agosto::int > 0 and julio > 0
-                                    then 
-                                        case 
-                                            when julio_corregido > 0 and julio_corregido >= julio and (julio_venta::float / case when julio_corregido::float > 0 then julio_corregido::float else 1 end) > 1 and julio_corregido > agosto
-                                                then ((agosto::float / julio::float) * (julio_venta::float / case when julio_corregido::float > 0 then julio_corregido::float else 1 end) * julio_corregido)::int
-                                            when julio_corregido > 0 and julio_corregido >= julio and (julio_venta::float / case when julio_corregido::float > 0 then julio_corregido::float else 1 end) < 0.60 and julio_corregido > agosto
-                                                then ((agosto::float / julio::float) * (julio_venta::float / case when julio_corregido::float > 0 then julio_corregido::float else 1 end) * julio_corregido)::int
-                                            when julio_corregido > 0 and julio_corregido >= julio and (julio_venta::float / case when julio_corregido::float > 0 then julio_corregido::float else 1 end) >= 0.60
-                                                then ((agosto::float / julio::float) * julio_corregido)::int
-                                            when julio_corregido > 0 and julio_corregido < julio and (julio_venta::float / case when julio_corregido::float > 0 then julio_corregido::float else 1 end) >= 0.80 and julio_venta <= agosto
-                                                then agosto
-                                            when julio_corregido > 0 and julio_corregido < julio and (julio_venta::float / case when julio_corregido::float > 0 then julio_corregido::float else 1 end) >= 0.80 and julio_venta > agosto
-                                                then julio_venta
-                                            when julio_corregido > 0 and julio_corregido < julio and (julio_venta::float / case when julio_corregido::float > 0 then julio_corregido::float else 1 end) < 0.80
-                                                then ((julio_venta::float / case when julio_corregido::float > 0 then julio_corregido::float else 1 end) * agosto)::int
-                                            when julio_corregido = 0 and julio_venta > 0 and (julio_venta::float / case when julio::float > 0 then julio::float else 1 end) >= 0.40
-                                                then agosto
-                                            when julio_corregido = 0 and julio_venta > 0 and (julio_venta::float / case when julio::float > 0 then julio::float else 1 end) < 0.40
-                                                then ((julio_venta::float / case when julio::float > 0 then julio::float else 1 end) * agosto)::int
-                                            when julio_corregido = 0 and julio_venta = 0
-                                                then 0
-                                            else agosto
-                                        end
-                                else 0
-                            end as agosto_corregido,
+                          agosto_corregido,
                           septiembre,
                           septiembre_venta,
                           octubre,
