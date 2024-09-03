@@ -73,7 +73,7 @@ def update_programacion(data: []):
 
 
 def get_programacion_columns(request):
-    mes = int(request.GET.get("mes", "8"))
+    mes = int(request.GET.get("mes", "9"))
     sql = f"""
         select distinct extract('week' from fecha) - extract('week' from '2024-{str(mes).rjust(2, "0")}-01'::date) + 1 as semana,
                case 
