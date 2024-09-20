@@ -285,7 +285,7 @@ def get_insumos_by_month(request):
                     when pr.mes = 7 then p.jul2024corr
                     when pr.mes = 8 then p.aug2024corr
                     when pr.mes = 9 then p.sep2024corr
-                end as plan,
+                end as plan_mensual,
                 pr.plan,
                 pr.prod,
                 mes,
