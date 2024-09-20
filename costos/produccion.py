@@ -252,6 +252,67 @@ def get_produccion_by_productos(request):
 
     return JsonResponse(result, safe=False)
 
+
+def get_insumos_by_month(request):
+    mes = int(request.GET.get("mes", "9"))
+
+    sql = f"""
+        with prog as (select 
+                cp.producto_id,
+                pr.id,
+                pr.ref_id,
+                pr.nombre,
+                pr.categoria,
+                cp.responsable,
+                sum(cp.prod) as prod,
+                sum(cp.plan) as plan,
+                extract(month from cp.fecha) as mes,
+                extract('week' from fecha) - extract('week' from '2024-{str(mes).rjust(2, "0")}-02'::date) + 1 as semana
+          from costos_programacion cp
+            join costos_productos pr
+              on pr.id = cp.producto_id
+        where extract(year from cp.fecha) = 2024
+          and extract(month from cp.fecha) = 9
+        group by cp.producto_id, pr.id, pr.ref_id, nombre, categoria, responsable, extract(month from cp.fecha), semana),
+        data as (select pr.producto_id,
+                pr.nombre,
+                pr.categoria,
+                pr.responsable,
+                case
+                    when pr.mes = 4 then p.apr2024
+                    when pr.mes = 5 then p.may2024corr
+                    when pr.mes = 6 then p.jun2024corr
+                    when pr.mes = 7 then p.jul2024corr
+                    when pr.mes = 8 then p.aug2024corr
+                    when pr.mes = 9 then p.sep2024corr
+                end as plan,
+                pr.plan,
+                pr.prod,
+                mes,
+                semana
+          from prog pr
+            join planificacion2024 p
+                on p.codigo = pr.ref_id::int)
+        select  semana, 
+                ci.nombre as insumo, 
+                sum(cc.cantidad / p.lote_produccion * d.prod) as cantidad 
+          from data d
+            join costos_productos p
+              on d.producto_id = p.id
+            join costos_costos cc
+              on d.producto_id = cc.producto_id
+            join costos_insumos ci
+              on ci.id = cc.insumo_id 
+        group by semana, ci.nombre
+    """
+
+    with connection.cursor() as cursor:
+        cursor.execute(sql)
+        result = _dictfetchall(cursor)
+
+    return JsonResponse(result, safe=False)
+
+
 def _dictfetchall(cursor):
     """
     Return all rows from a cursor as a dict.

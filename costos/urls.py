@@ -42,4 +42,5 @@ urlpatterns = [
     path('categorias', get_categories),
     path('get_produccion_by_category', produccion.get_produccion_by_category, name='get_produccion_by_category'),
     path('get_produccion_by_productos', produccion.get_produccion_by_productos, name='get_produccion_by_productos'),
+    path('get_insumos_by_month', produccion.get_insumos_by_month, name='get_insumos_by_month'),
 ]
