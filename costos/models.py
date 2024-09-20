@@ -13,6 +13,7 @@ class Insumos(models.Model):
 class Productos(models.Model):
     id = models.AutoField(primary_key=True)
     codigo = models.CharField(max_length=50)
+    categoria = models.CharField(max_length=250, default='PANADERIA')
     nombre = models.CharField(max_length=250)
     ref_id = models.CharField(max_length=250, null=True)
     utilidad = models.FloatField()

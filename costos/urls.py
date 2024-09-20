@@ -40,4 +40,6 @@ urlpatterns = [
     path('planning', statistics.get_planning, name='get_planning'),
     path('programacion_columnas', produccion.get_programacion_columns, name='programacion_columnas'),
     path('categorias', get_categories),
+    path('get_produccion_by_category', produccion.get_produccion_by_category, name='get_produccion_by_category'),
+    path('get_produccion_by_productos', produccion.get_produccion_by_productos, name='get_produccion_by_productos'),
 ]

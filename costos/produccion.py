@@ -153,6 +153,104 @@ def get_programacion_columns(request):
 
     return JsonResponse(res, safe=False)
 
+def get_produccion_by_category(request):
+    mes = int(request.GET.get("mes", "9"))
+
+    sql = f"""
+    with prog as (select 
+            pr.id,
+            pr.ref_id,
+            pr.nombre,
+            pr.categoria,
+            cp.responsable,
+            sum(cp.prod) as prod,
+            extract(month from cp.fecha) as mes
+      from costos_programacion cp
+        join costos_productos pr
+          on pr.id = cp.producto_id
+    where extract(year from cp.fecha) = 2024
+      and extract(month from cp.fecha) = {mes}
+    group by pr.id, pr.ref_id, nombre, categoria, responsable, extract(month from cp.fecha)),
+    data as (select pr.nombre,
+            pr.categoria,
+            pr.responsable,
+            case
+                when pr.mes = 4 then p.apr2024
+                when pr.mes = 5 then p.may2024corr
+                when pr.mes = 6 then p.jun2024corr
+                when pr.mes = 7 then p.jul2024corr
+                when pr.mes = 8 then p.aug2024corr
+                when pr.mes = 9 then p.sep2024corr
+            end as plan,
+            pr.prod
+      from prog pr
+        join planificacion2024 p
+            on p.codigo = pr.ref_id::int)
+    select categoria, 
+            sum(plan)::int as planeado, 
+            sum(prod)::int as producido, 
+            (round(sum(prod)::decimal / sum(plan)::decimal * 100, 2))::float as porcentaje_ejecutado
+      from data
+    group by categoria
+    having sum(plan)::decimal > 0
+    order by categoria
+    """
+
+    with connection.cursor() as cursor:
+        cursor.execute(sql)
+        result = _dictfetchall(cursor)
+
+    return JsonResponse(result, safe=False)
+
+def get_produccion_by_productos(request):
+    mes = int(request.GET.get("mes", "9"))
+
+    sql = f"""
+    with prog as (select 
+            pr.id,
+            pr.ref_id,
+            pr.nombre,
+            pr.categoria,
+            cp.responsable,
+            sum(cp.prod) as prod,
+            extract(month from cp.fecha) as mes
+      from costos_programacion cp
+        join costos_productos pr
+          on pr.id = cp.producto_id
+    where extract(year from cp.fecha) = 2024
+      and extract(month from cp.fecha) = {mes}
+    group by pr.id, pr.ref_id, nombre, categoria, responsable, extract(month from cp.fecha)),
+    data as (select pr.nombre,
+            pr.categoria,
+            pr.responsable,
+            case
+                when pr.mes = 4 then p.apr2024
+                when pr.mes = 5 then p.may2024corr
+                when pr.mes = 6 then p.jun2024corr
+                when pr.mes = 7 then p.jul2024corr
+                when pr.mes = 8 then p.aug2024corr
+                when pr.mes = 9 then p.sep2024corr
+            end as plan,
+            pr.prod
+      from prog pr
+        join planificacion2024 p
+            on p.codigo = pr.ref_id::int)
+    select  categoria, 
+            nombre as producto,
+            sum(plan)::int as planeado, 
+            sum(prod)::int as producido, 
+            (round(sum(prod)::decimal / sum(plan)::decimal * 100, 2))::float as porcentaje_ejecutado
+      from data
+    group by categoria, nombre
+    having sum(distinct plan)::decimal > 0
+    order by categoria, nombre
+    """
+
+    with connection.cursor() as cursor:
+        cursor.execute(sql)
+        result = _dictfetchall(cursor)
+
+    return JsonResponse(result, safe=False)
 
 def _dictfetchall(cursor):
     """
