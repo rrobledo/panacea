@@ -294,8 +294,8 @@ def get_insumos_by_month(request):
             join planificacion2024 p
                 on p.codigo = pr.ref_id::int)
         select  semana, 
-                ci.nombre as insumo, 
-                sum(cc.cantidad / p.lote_produccion * d.prod) as cantidad 
+                ci.nombre as insumo,
+                round(sum(cc.cantidad::decimal / p.lote_produccion::decimal * d.plan::decimal), 2) as cantidad  
           from data d
             join costos_productos p
               on d.producto_id = p.id
