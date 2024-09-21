@@ -8,6 +8,8 @@ def get_programacion(request, mes = 7, responsable = None, semana = 0):
     condition = ""
     if responsable is not None and responsable != "Todos":
         condition = f" and cp.responsable = '{responsable}'"
+    if semana is None:
+        semana = 0
 
     sql = f"""
          select cp.producto_id as id,
