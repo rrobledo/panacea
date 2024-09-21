@@ -4,7 +4,7 @@ import itertools
 from .models import Programacion
 from datetime import datetime
 
-def get_programacion(request, mes = 7, responsable = None):
+def get_programacion(request, mes = 7, responsable = None, semana = 0):
     condition = ""
     if responsable is not None and responsable != "Todos":
         condition = f" and cp.responsable = '{responsable}'"
@@ -30,6 +30,10 @@ def get_programacion(request, mes = 7, responsable = None):
             join planificacion2024 p
                 on p.codigo = pr.ref_id::int
          where extract(month from fecha) = {mes}
+           and (
+            {semana} = 0
+            or extract('week' from fecha) - extract('week' from '2024-{str(mes).rjust(2, "0")}-02'::date) + 1 = {semana}
+           )
          {condition}
          order by producto_nombre, codigo;
     """
@@ -74,6 +78,7 @@ def update_programacion(data: []):
 
 def get_programacion_columns(request):
     mes = int(request.GET.get("mes", "9"))
+    semana = int(request.GET.get("semana", "0"))
     sql = f"""
         select distinct extract('week' from fecha) - extract('week' from '2024-{str(mes).rjust(2, "0")}-02'::date) + 1 as semana,
                case 
@@ -88,6 +93,10 @@ def get_programacion_columns(request):
                 extract(dow from fecha::date)
           from costos_programacion cp
          where extract(month from fecha) = {mes}
+           and (
+            {semana} = 0
+            or extract('week' from fecha) - extract('week' from '2024-{str(mes).rjust(2, "0")}-02'::date) + 1 = {semana}
+           )
          order by codigo;
     """
     with connection.cursor() as cursor:

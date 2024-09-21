@@ -132,9 +132,10 @@ class ProgramacionViewSet(viewsets.ViewSet):
         def list(self, request):
             mes = self.request.query_params.get('mes')
             if mes is None:
-                mes = 7
+                mes = 9
             responsable = self.request.query_params.get('responsable')
-            res = produccion.get_programacion(request, mes, responsable)
+            semana = self.request.query_params.get('semana')
+            res = produccion.get_programacion(request, mes, responsable, semana)
             return JsonResponse(res, safe=False)
 
         def create(self, request):
