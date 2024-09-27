@@ -21,6 +21,7 @@ def get_programacion(request, mes = 7, responsable = None, semana = 0):
                     when extract(month from fecha) = 7 then p.jul2024corr
                     when extract(month from fecha) = 8 then p.aug2024corr
                     when extract(month from fecha) = 9 then p.sep2024corr
+                    when extract(month from fecha) = 10 then p.oct2024corr
                 end as planeado,
                 cp.responsable,
                 to_char(fecha, 'YYYYMMDD') as codigo,
@@ -192,6 +193,7 @@ def get_produccion_by_category(request):
                 when pr.mes = 7 then p.jul2024corr
                 when pr.mes = 8 then p.aug2024corr
                 when pr.mes = 9 then p.sep2024corr
+                when pr.mes = 10 then p.oct2024corr
             end as plan,
             pr.prod
       from prog pr
@@ -241,6 +243,7 @@ def get_produccion_by_productos(request):
                 when pr.mes = 7 then p.jul2024corr
                 when pr.mes = 8 then p.aug2024corr
                 when pr.mes = 9 then p.sep2024corr
+                when pr.mes = 10 then p.oct2024corr
             end as plan,
             pr.prod
       from prog pr
@@ -296,6 +299,7 @@ def get_insumos_by_month(request):
                     when pr.mes = 7 then p.jul2024corr
                     when pr.mes = 8 then p.aug2024corr
                     when pr.mes = 9 then p.sep2024corr
+                    when pr.mes = 10 then p.oct2024corr
                 end as plan_mensual,
                 pr.plan,
                 pr.prod,

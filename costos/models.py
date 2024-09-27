@@ -76,8 +76,8 @@ class Programacion(models.Model):
     producto_nombre = models.CharField(max_length=255, null=True)
     responsable = models.CharField(max_length=50)
 
-    plan = models.IntegerField(default=0)
-    prod = models.IntegerField(default=0)
+    plan = models.IntegerField(null=True)
+    prod = models.IntegerField(null=True)
 
 
 class Planificacion(models.Model):
