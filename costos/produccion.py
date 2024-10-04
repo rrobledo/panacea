@@ -268,10 +268,12 @@ def get_produccion_by_productos(request):
     return JsonResponse(result, safe=False)
 
 
+
 def get_insumos_by_month(request):
     mes = int(request.GET.get("mes", "9"))
+    by_week = request.GET.get("by_week", "yes")
 
-    sql = f"""
+    sql_base = f"""
         with prog as (select 
                 cp.producto_id,
                 pr.id,
@@ -287,7 +289,7 @@ def get_insumos_by_month(request):
             join costos_productos pr
               on pr.id = cp.producto_id
         where extract(year from cp.fecha) = 2024
-          and extract(month from cp.fecha) = 9
+          and extract(month from cp.fecha) = {mes}
         group by cp.producto_id, pr.id, pr.ref_id, nombre, categoria, pr.responsable, extract(month from cp.fecha), semana),
         data as (select pr.producto_id,
                 pr.nombre,
@@ -309,18 +311,39 @@ def get_insumos_by_month(request):
           from prog pr
             join planificacion2024 p
                 on p.codigo = pr.ref_id::int)
-        select  semana, 
-                ci.nombre as insumo,
-                round(sum(cc.cantidad::decimal / p.lote_produccion::decimal * d.plan::decimal), 2) as cantidad  
-          from data d
-            join costos_productos p
-              on d.producto_id = p.id
-            join costos_costos cc
-              on d.producto_id = cc.producto_id
-            join costos_insumos ci
-              on ci.id = cc.insumo_id 
-        group by semana, ci.nombre
-    """
+                """
+    if by_week == "yes":
+        sql = f"""
+            {sql_base}      
+            select  semana, 
+                    ci.nombre as insumo,
+                    round(sum(cc.cantidad::decimal / p.lote_produccion::decimal * d.plan::decimal), 2) as plan,  
+                    round(sum(cc.cantidad::decimal / p.lote_produccion::decimal * d.prod::decimal), 2) as usado
+              from data d
+                join costos_productos p
+                  on d.producto_id = p.id
+                join costos_costos cc
+                  on d.producto_id = cc.producto_id
+                join costos_insumos ci
+                  on ci.id = cc.insumo_id 
+            group by semana, ci.nombre
+        """
+    else:
+        sql = f"""
+            {sql_base}      
+            select  mes, 
+                    ci.nombre as insumo,
+                    round(sum(cc.cantidad::decimal / p.lote_produccion::decimal * d.plan::decimal), 2) as plan,  
+                    round(sum(cc.cantidad::decimal / p.lote_produccion::decimal * d.prod::decimal), 2) as usado
+              from data d
+                join costos_productos p
+                  on d.producto_id = p.id
+                join costos_costos cc
+                  on d.producto_id = cc.producto_id
+                join costos_insumos ci
+                  on ci.id = cc.insumo_id 
+            group by mes, ci.nombre
+        """
 
     with connection.cursor() as cursor:
         cursor.execute(sql)
