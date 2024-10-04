@@ -315,40 +315,74 @@ def get_insumos_by_month(request):
                 """
     if by_week == "yes":
         sql = f"""
-            {sql_base}      
-            select  semana, 
-                    ci.nombre as insumo,
-                    round(sum(cc.cantidad::decimal / p.lote_produccion::decimal * d.plan::decimal), 2) as plan,  
-                    round(sum(cc.cantidad::decimal / p.lote_produccion::decimal * d.prod::decimal), 2) as usado,
-                    round((sum(cc.cantidad::decimal / p.lote_produccion::decimal * d.plan::decimal) / ci.cantidad * ci.precio)::decimal, 2) as plan_precio,
-                    round((sum(cc.cantidad::decimal / p.lote_produccion::decimal * d.prod::decimal) / ci.cantidad * ci.precio)::decimal, 2) as usado_precio
-              from data d
-                join costos_productos p
-                  on d.producto_id = p.id
-                join costos_costos cc
-                  on d.producto_id = cc.producto_id
-                join costos_insumos ci
-                  on ci.id = cc.insumo_id
-            where {semana} = 0 or semana = {semana} 
-            group by semana, ci.id
+            {sql_base}
+            , res as (      
+                select  semana, 
+                        ci.nombre as insumo,
+                        round(sum(cc.cantidad::decimal / p.lote_produccion::decimal * d.plan::decimal), 2) as plan,  
+                        round(sum(cc.cantidad::decimal / p.lote_produccion::decimal * d.prod::decimal), 2) as usado,
+                        round((sum(cc.cantidad::decimal / p.lote_produccion::decimal * d.plan::decimal) / ci.cantidad * ci.precio)::decimal, 2) as plan_precio,
+                        round((sum(cc.cantidad::decimal / p.lote_produccion::decimal * d.prod::decimal) / ci.cantidad * ci.precio)::decimal, 2) as usado_precio
+                  from data d
+                    join costos_productos p
+                      on d.producto_id = p.id
+                    join costos_costos cc
+                      on d.producto_id = cc.producto_id
+                    join costos_insumos ci
+                      on ci.id = cc.insumo_id
+                where {semana} = 0 or semana = {semana} 
+                group by semana, ci.id)
+            select semana,
+                   insumo,
+                   plan,
+                   usado,
+                   plan_precio,
+                   usado_precio
+              from res
+            union
+            select 999,
+                   'Total',
+                   null,
+                   null,
+                   sum(plan_precio),
+                   sum(usado_precio)
+              from res
+            order by 1, 2
         """
     else:
         sql = f"""
-            {sql_base}      
-            select  mes, 
-                    ci.nombre as insumo,
-                    round(sum(cc.cantidad::decimal / p.lote_produccion::decimal * d.plan::decimal), 2) as plan,  
-                    round(sum(cc.cantidad::decimal / p.lote_produccion::decimal * d.prod::decimal), 2) as usado,
-                    round((sum(cc.cantidad::decimal / p.lote_produccion::decimal * d.plan::decimal) / ci.cantidad * ci.precio)::decimal, 2) as plan_precio,
-                    round((sum(cc.cantidad::decimal / p.lote_produccion::decimal * d.prod::decimal) / ci.cantidad * ci.precio)::decimal, 2) as usado_precio
-              from data d
-                join costos_productos p
-                  on d.producto_id = p.id
-                join costos_costos cc
-                  on d.producto_id = cc.producto_id
-                join costos_insumos ci
-                  on ci.id = cc.insumo_id 
-            group by mes, ci.id
+            {sql_base}
+            , res as (      
+                select  mes, 
+                        ci.nombre as insumo,
+                        round(sum(cc.cantidad::decimal / p.lote_produccion::decimal * d.plan::decimal), 2) as plan,  
+                        round(sum(cc.cantidad::decimal / p.lote_produccion::decimal * d.prod::decimal), 2) as usado,
+                        round((sum(cc.cantidad::decimal / p.lote_produccion::decimal * d.plan::decimal) / ci.cantidad * ci.precio)::decimal, 2) as plan_precio,
+                        round((sum(cc.cantidad::decimal / p.lote_produccion::decimal * d.prod::decimal) / ci.cantidad * ci.precio)::decimal, 2) as usado_precio
+                  from data d
+                    join costos_productos p
+                      on d.producto_id = p.id
+                    join costos_costos cc
+                      on d.producto_id = cc.producto_id
+                    join costos_insumos ci
+                      on ci.id = cc.insumo_id 
+                group by mes, ci.id)
+            select mes,
+                   insumo,
+                   plan,
+                   usado,
+                   plan_precio,
+                   usado_precio
+              from res
+            union
+            select 999,
+                   'Total',
+                   null,
+                   null,
+                   sum(plan_precio),
+                   sum(usado_precio)
+              from res
+            order by 1, 2
         """
 
     with connection.cursor() as cursor:
