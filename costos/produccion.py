@@ -72,6 +72,8 @@ def update_programacion(data: []):
                 codigo, op = key.split('-')
                 fecha = datetime.strptime(codigo, "%Y%m%d")
                 prog = Programacion.objects.get(producto_id=producto_id, fecha=fecha)
+                if value == "":
+                    value = None
                 if op == 'P':
                     prog.plan = value
                 else:
