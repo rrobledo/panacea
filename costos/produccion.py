@@ -7,7 +7,7 @@ from datetime import datetime
 def get_programacion(request, mes = 7, responsable = None, semana = 0):
     condition = ""
     if responsable is not None and responsable != "Todos":
-        condition = f" and cp.responsable = '{responsable}'"
+        condition = f" and pr.responsable = '{responsable}'"
     if semana is None:
         semana = 0
 
@@ -175,7 +175,7 @@ def get_produccion_by_category(request):
             pr.ref_id,
             pr.nombre,
             pr.categoria,
-            cp.responsable,
+            pr.responsable,
             sum(cp.prod) as prod,
             extract(month from cp.fecha) as mes
       from costos_programacion cp
@@ -183,7 +183,7 @@ def get_produccion_by_category(request):
           on pr.id = cp.producto_id
     where extract(year from cp.fecha) = 2024
       and extract(month from cp.fecha) = {mes}
-    group by pr.id, pr.ref_id, nombre, categoria, responsable, extract(month from cp.fecha)),
+    group by pr.id, pr.ref_id, nombre, categoria, pr.responsable, extract(month from cp.fecha)),
     data as (select pr.nombre,
             pr.categoria,
             pr.responsable,
@@ -225,7 +225,7 @@ def get_produccion_by_productos(request):
             pr.ref_id,
             pr.nombre,
             pr.categoria,
-            cp.responsable,
+            pr.responsable,
             sum(cp.prod) as prod,
             extract(month from cp.fecha) as mes
       from costos_programacion cp
@@ -233,7 +233,7 @@ def get_produccion_by_productos(request):
           on pr.id = cp.producto_id
     where extract(year from cp.fecha) = 2024
       and extract(month from cp.fecha) = {mes}
-    group by pr.id, pr.ref_id, nombre, categoria, responsable, extract(month from cp.fecha)),
+    group by pr.id, pr.ref_id, nombre, categoria, pr.responsable, extract(month from cp.fecha)),
     data as (select pr.nombre,
             pr.categoria,
             pr.responsable,
@@ -278,7 +278,7 @@ def get_insumos_by_month(request):
                 pr.ref_id,
                 pr.nombre,
                 pr.categoria,
-                cp.responsable,
+                pr.responsable,
                 sum(cp.prod) as prod,
                 sum(cp.plan) as plan,
                 extract(month from cp.fecha) as mes,
@@ -288,7 +288,7 @@ def get_insumos_by_month(request):
               on pr.id = cp.producto_id
         where extract(year from cp.fecha) = 2024
           and extract(month from cp.fecha) = 9
-        group by cp.producto_id, pr.id, pr.ref_id, nombre, categoria, responsable, extract(month from cp.fecha), semana),
+        group by cp.producto_id, pr.id, pr.ref_id, nombre, categoria, pr.responsable, extract(month from cp.fecha), semana),
         data as (select pr.producto_id,
                 pr.nombre,
                 pr.categoria,
