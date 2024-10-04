@@ -271,6 +271,7 @@ def get_produccion_by_productos(request):
 
 def get_insumos_by_month(request):
     mes = int(request.GET.get("mes", "9"))
+    semana = int(request.GET.get("semana", "0"))
     by_week = request.GET.get("by_week", "yes")
 
     sql_base = f"""
@@ -325,7 +326,8 @@ def get_insumos_by_month(request):
                 join costos_costos cc
                   on d.producto_id = cc.producto_id
                 join costos_insumos ci
-                  on ci.id = cc.insumo_id 
+                  on ci.id = cc.insumo_id
+            where {semana} = 0 or semana = {semana} 
             group by semana, ci.nombre
         """
     else:
