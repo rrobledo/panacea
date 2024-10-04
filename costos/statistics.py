@@ -6,7 +6,7 @@ import json
 from functools import lru_cache
 
 
-@lru_cache(3)
+@lru_cache(10)
 def get_cost_by_product(request, producto_id):
     def gen_costs(d, cantidad_lotes, costo_total):
         return {
