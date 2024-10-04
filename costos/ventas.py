@@ -6,6 +6,7 @@ from datetime import datetime
 
 def get_ventas_por_cliente(request):
     mes = int(request.GET.get("mes", "9"))
+    cliente = request.GET.get("cliente", "Todos")
 
     sql = f"""
         with aux as (select concat(
@@ -90,6 +91,7 @@ def get_ventas_por_cliente(request):
                round(subtotal_tarde::decimal, 2) as subtotal_tarde,
                round(subtotal::decimal, 2) as subtotal
           from res
+         where ('{cliente}' = 'Todos' or cliente = '{cliente}') 
          order by week_of_month, cliente desc
     """
 
