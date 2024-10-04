@@ -64,7 +64,7 @@ def update_programacion(data: []):
     for item in data:
         producto_id = item.get("id")
         responsable = item.get("responsable")
-        prod = Productos.objects.get(producto_id=producto_id)
+        prod = Productos.objects.get(id=producto_id)
         prod.responsable = responsable
         prod.save()
         for key, value in item.items():
