@@ -868,6 +868,15 @@ def get_planning_2024(request):
                                and s.product_id = p.codigo
                            )::int septiembre_venta,
                            oct2024 as octubre,
+                           oct2024corr as octubre_corregido,
+                           (select coalesce(sum(prod), 0)
+                              from costos_programacion s
+                                join costos_productos cp
+                                  on s.producto_id = cp.id
+                             where extract(year from s.fecha) = 2024
+                               and extract(month from s.fecha) = 10
+                               and cp.ref_id::int = p.codigo
+                           )::int octubre_prod,
                            (select coalesce(sum(count), 0)
                               from panacea_sales s
                              where s.operation_year = 2024

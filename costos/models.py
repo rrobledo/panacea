@@ -21,6 +21,7 @@ class Productos(models.Model):
     unidad_medida = models.CharField(max_length=10, default="GR")
     lote_produccion = models.IntegerField()
     tiempo_produccion = models.IntegerField(default=0)
+    responsable = models.CharField(max_length=50, default="Todos")
 
 
 class Costos(models.Model):

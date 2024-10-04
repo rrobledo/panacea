@@ -1,7 +1,7 @@
 from django.db import connection
 from django.http import JsonResponse
 import itertools
-from .models import Programacion
+from .models import Programacion, Productos
 from datetime import datetime
 
 def get_programacion(request, mes = 7, responsable = None, semana = 0):
@@ -23,7 +23,7 @@ def get_programacion(request, mes = 7, responsable = None, semana = 0):
                     when extract(month from fecha) = 9 then p.sep2024corr
                     when extract(month from fecha) = 10 then p.oct2024corr
                 end as planeado,
-                cp.responsable,
+                pr.responsable,
                 to_char(fecha, 'YYYYMMDD') as codigo,
                 cp.plan,
                 cp.prod
@@ -64,6 +64,9 @@ def update_programacion(data: []):
     for item in data:
         producto_id = item.get("id")
         responsable = item.get("responsable")
+        prod = Productos.objects.get(producto_id=producto_id)
+        prod.responsable = responsable
+        prod.save()
         for key, value in item.items():
             if key not in ('id', 'responsable', 'planeado'):
                 codigo, op = key.split('-')
@@ -73,9 +76,7 @@ def update_programacion(data: []):
                     prog.plan = value
                 else:
                     prog.prod = value
-                prog.responsable = responsable
                 prog.save()
-        pass
     pass
 
 
