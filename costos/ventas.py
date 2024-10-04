@@ -81,7 +81,14 @@ def get_ventas_por_cliente(request):
           from aux
          group by week_of_month, cliente
          order by week_of_month, subtotal desc)
-        select * 
+        select week_of_month,
+               cliente,
+               cantidad_maniana,
+               cantidad_tarde,
+               cantidad,
+               round(subtotal_maniana::decimal, 2) as subtotal_maniana,
+               round(subtotal_tarde::decimal, 2) as subtotal_tarde,
+               round(subtotal::decimal, 2) as subtotal
           from res
          order by week_of_month, cliente desc
     """
