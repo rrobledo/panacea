@@ -50,7 +50,7 @@ def get_ventas_por_cliente(request):
          group by substring(week_of_month, 0, 8)
         union
         select substring(week_of_month, 0, 8) as week_of_month,
-               cliente,
+               concat('',cliente),
                sum(cantidad)::int as cantidad,
                sum(cantidad_maniana)::int as cantidad_maniana,
                sum(cantidad_tarde)::int as cantidad_tarde,
@@ -72,7 +72,7 @@ def get_ventas_por_cliente(request):
          group by week_of_month
          union
          select week_of_month,
-               cliente,
+               concat(' ',cliente) as cliente,
                sum(cantidad)::int as cantidad,
                sum(cantidad_maniana)::int as cantidad_maniana,
                sum(cantidad_tarde)::int as cantidad_tarde,
