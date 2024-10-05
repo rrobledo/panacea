@@ -20,8 +20,8 @@ def get_cost_by_product(request, producto_id):
             return {
                 "insumo_nombre": d.insumo.nombre,
                 "cantidad": d.cantidad * cantidad_lotes,
-                "costo_individual": round(0, 2),
-                "porcentaje_del_total": round(0, 2),
+                "costo_individual": round(1, 2),
+                "porcentaje_del_total": round(1, 2),
             }
 
     prod = Productos.objects.get(id=producto_id)
