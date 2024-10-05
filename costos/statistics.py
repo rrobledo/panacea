@@ -9,12 +9,20 @@ from functools import lru_cache
 @lru_cache(10)
 def get_cost_by_product(request, producto_id):
     def gen_costs(d, cantidad_lotes, costo_total):
-        return {
-            "insumo_nombre": d.insumo.nombre,
-            "cantidad": d.cantidad * cantidad_lotes,
-            "costo_individual": round(d.insumo.precio / d.insumo.cantidad * d.cantidad * cantidad_lotes, 2),
-            "porcentaje_del_total": round((d.insumo.precio / d.insumo.cantidad * d.cantidad * cantidad_lotes) / costo_total * 100, 2),
-        }
+        if (d.insumo.cantidad * d.cantidad * cantidad_lotes) > 0:
+            return {
+                "insumo_nombre": d.insumo.nombre,
+                "cantidad": d.cantidad * cantidad_lotes,
+                "costo_individual": round(d.insumo.precio / d.insumo.cantidad * d.cantidad * cantidad_lotes, 2),
+                "porcentaje_del_total": round((d.insumo.precio / d.insumo.cantidad * d.cantidad * cantidad_lotes) / costo_total * 100, 2),
+            }
+        else:
+            return {
+                "insumo_nombre": d.insumo.nombre,
+                "cantidad": d.cantidad * cantidad_lotes,
+                "costo_individual": round(0, 2),
+                "porcentaje_del_total": round(0, 2),
+            }
 
     prod = Productos.objects.get(id=producto_id)
     cost_detail = Costos.objects.filter(producto_id=producto_id).all()
