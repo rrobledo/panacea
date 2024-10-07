@@ -32,7 +32,9 @@ def get_cost_by_product(request, producto_id):
     utilidad = float(request.GET.get("utilidad", None)) if request.GET.get("utilidad", None) else prod.utilidad
     precio_actual = float(request.GET.get("precio_actual", None)) if request.GET.get("precio_actual", None) else prod.precio_actual
 
-    sum_cost = sum([d.insumo.precio / d.insumo.cantidad * d.cantidad * cantidad_lotes for d in cost_detail])
+    sum_cost = sum([d.insumo.precio / d.insumo.cantidad * d.cantidad * cantidad_lotes if d.insumo.cantidad * d.cantidad * cantidad_lotes > 0 else 1 for d in cost_detail])
+    if sum_cost <= 0:
+        sum_cost = 1
     precio_sugerido = round(sum_cost / lote_produccion * ((utilidad / 100) + 1), 2)
     costo_unitario_mp = round(sum_cost / lote_produccion, 2)
     margen_utilidad = round(((precio_actual / sum_cost * lote_produccion) - 1) * 100, 2)
