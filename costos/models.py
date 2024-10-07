@@ -22,6 +22,7 @@ class Productos(models.Model):
     lote_produccion = models.IntegerField()
     tiempo_produccion = models.IntegerField(default=0)
     responsable = models.CharField(max_length=50, default="Todos")
+    is_producto = models.BooleanField(default=True)
 
 
 class Costos(models.Model):
