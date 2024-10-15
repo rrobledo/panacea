@@ -198,14 +198,22 @@ def get_produccion_by_category(request):
                 when pr.mes = 9 then p.sep2024corr
                 when pr.mes = 10 then p.oct2024corr
             end as plan,
-            pr.prod
+            pr.prod,
+            (select coalesce(sum(count), 0)
+              from panacea_sales s
+             where s.operation_year = 2024
+               and s.operation_month = pr.mes
+               and s.product_id = pr.ref_id::int
+            )::int vendido
       from prog pr
         join planificacion2024 p
             on p.codigo = pr.ref_id::int)
     select categoria, 
             sum(plan)::int as planeado, 
-            sum(prod)::int as producido, 
-            (round(sum(prod)::decimal / sum(plan)::decimal * 100, 2))::float as porcentaje_ejecutado
+            sum(prod)::int as producido,
+            sum(vendido)::int as vendido,
+            (round(sum(prod)::decimal / sum(plan)::decimal * 100, 2))::float as porcentaje_ejecutado,
+            (round(sum(vendido)::decimal / sum(plan)::decimal * 100, 2))::float as porcentaje_vendido
       from data
     group by categoria
     having sum(plan)::decimal > 0
@@ -237,6 +245,8 @@ def get_produccion_by_productos(request):
       and extract(month from cp.fecha) = {mes}
     group by pr.id, pr.ref_id, nombre, categoria, pr.responsable, extract(month from cp.fecha)),
     data as (select pr.nombre,
+            pr.id,
+            pr.mes,
             pr.categoria,
             pr.responsable,
             case
@@ -248,15 +258,23 @@ def get_produccion_by_productos(request):
                 when pr.mes = 9 then p.sep2024corr
                 when pr.mes = 10 then p.oct2024corr
             end as plan,
-            pr.prod
+            pr.prod,
+            (select coalesce(sum(count), 0)
+              from panacea_sales s
+             where s.operation_year = 2024
+               and s.operation_month = pr.mes
+               and s.product_id = pr.ref_id::int
+            )::int vendido
       from prog pr
         join planificacion2024 p
             on p.codigo = pr.ref_id::int)
     select  categoria, 
             nombre as producto,
             sum(plan)::int as planeado, 
-            sum(prod)::int as producido, 
-            (round(sum(prod)::decimal / sum(plan)::decimal * 100, 2))::float as porcentaje_ejecutado
+            sum(prod)::int as producido,
+            sum(vendido)::int as vendido,
+            (round(sum(prod)::decimal / sum(plan)::decimal * 100, 2))::float as porcentaje_ejecutado,
+            (round(sum(vendido)::decimal / sum(plan)::decimal * 100, 2))::float as porcentaje_vendido
       from data
     group by categoria, nombre
     having sum(distinct plan)::decimal > 0
