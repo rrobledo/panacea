@@ -910,6 +910,15 @@ def get_planning_2024(request):
                                and s.product_id = p.codigo
                            )::int noviembre_venta,
                            dec2024 as diciembre,
+                           dec2024corr as diciembre_corregido,
+                           (select coalesce(sum(prod), 0)
+                              from costos_programacion s
+                                join costos_productos cp
+                                  on s.producto_id = cp.id
+                             where extract(year from s.fecha) = 2024
+                               and extract(month from s.fecha) = 12
+                               and cp.ref_id::int = p.codigo
+                           )::int diciembre_prod,
                            (select coalesce(sum(count), 0)
                               from panacea_sales s
                              where s.operation_year = 2024
@@ -961,6 +970,8 @@ def get_planning_2024(request):
                           noviembre_prod,
                           noviembre_venta,
                           diciembre,
+                          diciembre_corregido,
+                          diciembre_prod,
                           diciembre_venta
                       from planning)
             select ref_id,
@@ -1003,6 +1014,8 @@ def get_planning_2024(request):
                     noviembre_prod,
                     noviembre_venta,
                     diciembre,
+                    diciembre_corregido,
+                    diciembre_prod,
                     diciembre_venta
               from planning_total
             union
@@ -1046,6 +1059,8 @@ def get_planning_2024(request):
                   sum(noviembre_prod),
                   sum(noviembre_venta),
                   sum(diciembre),
+                  sum(diciembre_corregido),
+                  sum(diciembre_prod),
                   sum(diciembre_venta)
               from planning_total
             order by 2;

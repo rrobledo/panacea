@@ -93,8 +93,14 @@ class RemitosSerializer(serializers.HyperlinkedModelSerializer):
         productos_data = validated_data.pop('productos')
         remito = Remitos.objects.create(**validated_data)
         for producto_data in productos_data:
-            RemitoDetalles.objects.create(remito=remito, **producto_data)
+            if producto_data.get("cantidad") > 0:
+                RemitoDetalles.objects.create(remito=remito, **producto_data)
         return remito
+
+    def update(self, remito, validated_data):
+        productos_data = validated_data.pop('productos')
+
+        return  remito
 
 class ProgramacionSerializer(serializers.HyperlinkedModelSerializer):
     producto_nombre = serializers.SerializerMethodField()

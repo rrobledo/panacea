@@ -25,6 +25,12 @@ class Productos(models.Model):
     is_producto = models.BooleanField(default=True)
 
 
+class ProductosRef(models.Model):
+    id = models.AutoField(primary_key=True)
+    producto = models.ForeignKey(Productos, on_delete=models.RESTRICT)
+    ref_id = models.CharField(max_length=250, null=True)
+    unidad_conversion = models.IntegerField(default=1)
+
 class Costos(models.Model):
     id = models.AutoField(primary_key=True)
     producto = models.ForeignKey(Productos, on_delete=models.RESTRICT)
