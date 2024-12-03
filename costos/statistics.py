@@ -763,24 +763,24 @@ def get_planning_2024(request):
                            case when pr.nombre is null then concat(p.productos) else pr.nombre end product_name,
                            jan2024 as enero_plan,
                            (select coalesce(sum(count), 0)
-                              from panacea_sales s
+                              from panacea_sales_v2 s
                              where s.operation_year = 2024
                                and s.operation_month = 1
-                               and s.product_id = p.codigo
+                               and s.product_id = p.producto_id
                              )::int enero_venta,
                            feb2024 as febrero,
                            (select coalesce(sum(count), 0)
-                              from panacea_sales s
+                              from panacea_sales_v2 s
                              where s.operation_year = 2024
                                and s.operation_month = 2
-                               and s.product_id = p.codigo
+                               and s.product_id = p.producto_id
                              )::int febrero_venta, 
                            mar2024 as marzo,
                            (select coalesce(sum(count), 0)
-                              from panacea_sales s
+                              from panacea_sales_v2 s
                              where s.operation_year = 2024
                                and s.operation_month = 3
-                               and s.product_id = p.codigo
+                               and s.product_id = p.producto_id
                              )::int marzo_venta, 
                            apr2024 as abril,
                            (select coalesce(sum(prod), 0)
@@ -792,10 +792,10 @@ def get_planning_2024(request):
                                and cp.ref_id::int = p.codigo
                            )::int abril_prod,
                            (select coalesce(sum(count), 0)
-                              from panacea_sales s
+                              from panacea_sales_v2 s
                              where s.operation_year = 2024
                                and s.operation_month = 4
-                               and s.product_id = p.codigo
+                               and s.product_id = p.producto_id
                              )::int abril_venta,
                            may2024 as mayo,
                            may2024corr as mayo_corregido,
@@ -808,10 +808,10 @@ def get_planning_2024(request):
                                and cp.ref_id::int = p.codigo
                            )::int mayo_prod,
                            (select coalesce(sum(count), 0)
-                              from panacea_sales s
+                              from panacea_sales_v2 s
                              where s.operation_year = 2024
                                and s.operation_month = 5
-                               and s.product_id = p.codigo
+                               and s.product_id = p.producto_id
                            )::int mayo_venta,
                            jun2024 as junio,
                            jun2024corr as junio_corregido,
@@ -824,10 +824,10 @@ def get_planning_2024(request):
                                and cp.ref_id::int = p.codigo
                            )::int junio_prod,
                            (select coalesce(sum(count), 0)
-                              from panacea_sales s
+                              from panacea_sales_v2 s
                              where s.operation_year = 2024
                                and s.operation_month = 6
-                               and s.product_id = p.codigo
+                               and s.product_id = p.producto_id
                            )::int junio_venta,
                            jul2024 as julio,
                            jul2024corr as julio_corregido,
@@ -840,10 +840,10 @@ def get_planning_2024(request):
                                and cp.ref_id::int = p.codigo
                            )::int julio_prod,
                            (select coalesce(sum(count), 0)
-                              from panacea_sales s
+                              from panacea_sales_v2 s
                              where s.operation_year = 2024
                                and s.operation_month = 7
-                               and s.product_id = p.codigo
+                               and s.product_id = p.producto_id
                            )::int julio_venta,
                            aug2024 as agosto,
                            aug2024corr as agosto_corregido,
@@ -856,10 +856,10 @@ def get_planning_2024(request):
                                and cp.ref_id::int = p.codigo
                            )::int agosto_prod,
                            (select coalesce(sum(count), 0)
-                              from panacea_sales s
+                              from panacea_sales_v2 s
                              where s.operation_year = 2024
                                and s.operation_month = 8
-                               and s.product_id = p.codigo
+                               and s.product_id = p.producto_id
                            )::int agosto_venta,
                            sep2024 as septiembre,
                            sep2024corr as septiembre_corregido,
@@ -872,10 +872,10 @@ def get_planning_2024(request):
                                and cp.ref_id::int = p.codigo
                            )::int septiembre_prod,
                            (select coalesce(sum(count), 0)
-                              from panacea_sales s
+                              from panacea_sales_v2 s
                              where s.operation_year = 2024
                                and s.operation_month = 9
-                               and s.product_id = p.codigo
+                               and s.product_id = p.producto_id
                            )::int septiembre_venta,
                            oct2024 as octubre,
                            oct2024corr as octubre_corregido,
@@ -888,10 +888,10 @@ def get_planning_2024(request):
                                and cp.ref_id::int = p.codigo
                            )::int octubre_prod,
                            (select coalesce(sum(count), 0)
-                              from panacea_sales s
+                              from panacea_sales_v2 s
                              where s.operation_year = 2024
                                and s.operation_month = 10
-                               and s.product_id = p.codigo
+                               and s.product_id = p.producto_id
                            )::int octubre_venta,
                            nov2024 as noviembre,
                            nov2024corr as noviembre_corregido,
@@ -904,10 +904,10 @@ def get_planning_2024(request):
                                and cp.ref_id::int = p.codigo
                            )::int noviembre_prod,
                            (select coalesce(sum(count), 0)
-                              from panacea_sales s
+                              from panacea_sales_v2 s
                              where s.operation_year = 2024
                                and s.operation_month = 11
-                               and s.product_id = p.codigo
+                               and s.product_id = p.producto_id
                            )::int noviembre_venta,
                            dec2024 as diciembre,
                            dec2024corr as diciembre_corregido,
@@ -920,10 +920,10 @@ def get_planning_2024(request):
                                and cp.ref_id::int = p.codigo
                            )::int diciembre_prod,
                            (select coalesce(sum(count), 0)
-                              from panacea_sales s
+                              from panacea_sales_v2 s
                              where s.operation_year = 2024
                                and s.operation_month = 12
-                               and s.product_id = p.codigo
+                               and s.product_id = p.producto_id
                            )::int diciembre_venta
                       from planificacion2024 p 
                         left outer join costos_productos pr

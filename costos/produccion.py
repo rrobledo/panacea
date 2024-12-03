@@ -204,10 +204,10 @@ def get_produccion_by_category(request):
             end as plan,
             pr.prod,
             (select coalesce(sum(count), 0)
-              from panacea_sales s
+              from panacea_sales_v2 s
              where s.operation_year = 2024
                and s.operation_month = pr.mes
-               and s.product_id = pr.ref_id::int
+               and s.product_id = pr.id
             )::int vendido
       from prog pr
         join planificacion2024 p
@@ -266,10 +266,10 @@ def get_produccion_by_productos(request):
             end as plan,
             pr.prod,
             (select coalesce(sum(count), 0)
-              from panacea_sales s
+              from panacea_sales_v2 s
              where s.operation_year = 2024
                and s.operation_month = pr.mes
-               and s.product_id = pr.ref_id::int
+               and s.product_id = pr.id
             )::int vendido
       from prog pr
         join planificacion2024 p
