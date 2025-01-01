@@ -37,7 +37,10 @@ def get_programacion(request, mes = 7, responsable = None, semana = 0):
          where extract(month from fecha) = {mes}
            and (
             {semana} = 0
-            or extract('week' from fecha) - extract('week' from '2024-{str(mes).rjust(2, "0")}-02'::date) + 1 = {semana}
+            or case 
+                    when extract('week' from fecha) - extract('week' from '2024-{str(mes).rjust(2, "0")}-02'::date) + 1 < 0 then 5
+                    else extract('week' from fecha) - extract('week' from '2024-{str(mes).rjust(2, "0")}-02'::date) + 1
+               end = {semana}
            )
          {condition}
          order by producto_nombre, codigo;
