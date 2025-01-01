@@ -88,7 +88,11 @@ def get_programacion_columns(request):
     mes = int(request.GET.get("mes", "9"))
     semana = int(request.GET.get("semana", "0"))
     sql = f"""
-        select distinct extract('week' from fecha) - extract('week' from '2024-{str(mes).rjust(2, "0")}-02'::date) + 1 as semana,
+        select distinct 
+               case 
+                    when extract('week' from fecha) - extract('week' from '2024-{str(mes).rjust(2, "0")}-02'::date) + 1 < 0 then 5
+                    else extract('week' from fecha) - extract('week' from '2024-{str(mes).rjust(2, "0")}-02'::date) + 1
+               end as semana,
                case 
                     when extract(dow from fecha::date) = 1 then 'Lun'
                     when extract(dow from fecha::date) = 2 then 'Mar'
@@ -103,7 +107,10 @@ def get_programacion_columns(request):
          where extract(month from fecha) = {mes}
            and (
             {semana} = 0
-            or extract('week' from fecha) - extract('week' from '2024-{str(mes).rjust(2, "0")}-02'::date) + 1 = {semana}
+            or case 
+                    when extract('week' from fecha) - extract('week' from '2024-{str(mes).rjust(2, "0")}-02'::date) + 1 < 0 then 5
+                    else extract('week' from fecha) - extract('week' from '2024-{str(mes).rjust(2, "0")}-02'::date) + 1
+               end = {semana}
            )
          order by codigo;
     """

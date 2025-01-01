@@ -89,6 +89,15 @@ class Programacion(models.Model):
 
 
 class Planificacion(models.Model):
+    id = models.AutoField(primary_key=True)
+    fecha = models.DateField(null=True)
+    producto = models.ForeignKey(Productos, on_delete=models.RESTRICT, null=True)
+    plan = models.IntegerField(null=True)
+    sistema = models.IntegerField(null=True)
+    corregido = models.IntegerField(null=True)
+
+
+class Planificacion2024(models.Model):
     codigo = models.IntegerField(default=0, primary_key=True)
     productos = models.CharField(max_length=50)
     jan2024 = models.IntegerField(default=0)

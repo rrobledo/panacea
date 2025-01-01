@@ -1,4 +1,4 @@
-from .models import Insumos, Productos, Costos, Programacion, Planificacion, Clientes, Remitos, RemitoDetalles
+from .models import Insumos, Productos, Costos, Programacion, Planificacion2024, Clientes, Remitos, RemitoDetalles
 from rest_framework import serializers
 from django.urls import reverse
 
@@ -116,7 +116,7 @@ class ProgramacionSerializer(serializers.HyperlinkedModelSerializer):
         planificado = None
         planeado = None
         try:
-            planificado = Planificacion.objects.get(codigo=int(obj.producto.ref_id))
+            planificado = Planificacion2024.objects.get(codigo=int(obj.producto.ref_id))
         except:
             planificado = None
         if planificado:
