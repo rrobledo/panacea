@@ -162,7 +162,7 @@ def get_planning_columns(request):
     return JsonResponse(res, safe=False)
 
 
-def get_programacion(request, mes = 7, responsable = None, semana = 0):
+def get_programacion(request, anio = 2025, mes = 7, responsable = None, semana = 0):
     condition = ""
     if responsable is not None and responsable != "Todos":
         condition = f" and pr.responsable = '{responsable}'"
@@ -172,17 +172,7 @@ def get_programacion(request, mes = 7, responsable = None, semana = 0):
     sql = f"""
          select cp.producto_id as id,
                 case when pr.nombre is null then cp.producto_nombre else pr.nombre end as producto_nombre,
-                case
-                    when extract(month from fecha) = 4 then p.apr2024
-                    when extract(month from fecha) = 5 then p.may2024corr
-                    when extract(month from fecha) = 6 then p.jun2024corr
-                    when extract(month from fecha) = 7 then p.jul2024corr
-                    when extract(month from fecha) = 8 then p.aug2024corr
-                    when extract(month from fecha) = 9 then p.sep2024corr
-                    when extract(month from fecha) = 10 then p.oct2024corr
-                    when extract(month from fecha) = 11 then p.nov2024corr
-                    when extract(month from fecha) = 12 then p.dec2024corr
-                end as planeado,
+                (select max(corregido) from costos_planificacion pl where pl.producto_id = cp.producto_id and  extract(year from pl.fecha) = extract(year from cp.fecha) and extract(month from pl.fecha) = extract(month from cp.fecha)) as planeado,
                 pr.responsable,
                 to_char(fecha, 'YYYYMMDD') as codigo,
                 cp.plan,
@@ -192,7 +182,8 @@ def get_programacion(request, mes = 7, responsable = None, semana = 0):
               on pr.id = cp.producto_id
             join planificacion2024 p
                 on p.codigo = pr.ref_id::int
-         where extract(month from fecha) = {mes}
+         where extract(year from fecha) = {anio}
+           and extract(month from fecha) = {mes} 
            and (
             {semana} = 0
             or case 
@@ -246,6 +237,7 @@ def update_programacion(data: []):
 
 
 def get_programacion_columns(request):
+    anio = int(request.GET.get("anio", "2025"))
     mes = int(request.GET.get("mes", "9"))
     semana = int(request.GET.get("semana", "0"))
     sql = f"""
@@ -265,7 +257,8 @@ def get_programacion_columns(request):
                 to_char(fecha, 'YYYYMMDD') as codigo,
                 extract(dow from fecha::date)
           from costos_programacion cp
-         where extract(month from fecha) = {mes}
+         where extract(year from fecha) = {anio}
+           and extract(month from fecha) = {mes}
            and (
             {semana} = 0
             or case 

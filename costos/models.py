@@ -95,6 +95,7 @@ class Planificacion(models.Model):
     plan = models.IntegerField(null=True)
     sistema = models.IntegerField(null=True)
     corregido = models.IntegerField(null=True)
+    indice = models.FloatField(null=True)
 
 
 class Planificacion2024(models.Model):
