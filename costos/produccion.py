@@ -4,6 +4,164 @@ import itertools
 from .models import Programacion, Productos
 from datetime import datetime
 
+def get_planning(request):
+    anio = int(request.GET.get("anio", 2024))
+    sql = f"""
+         select cp.producto_id as id,
+                pr.nombre as producto_nombre,
+                to_char(fecha, 'YYYYMM') as codigo,
+                cp.plan,
+                cp.sistema,
+                cp.corregido,
+                (select coalesce(sum(prod), 0)
+                   from costos_programacion s
+                  where extract(year from s.fecha) = extract(year from cp.fecha)
+                    and extract(month from s.fecha) = extract(month from cp.fecha)
+                    and s.producto_id = cp.producto_id
+                )::int prod,
+                (select coalesce(sum(count), 0)
+                   from panacea_sales_v2 s
+                  where s.operation_year = extract(year from cp.fecha)
+                    and s.operation_month = extract(month from cp.fecha)
+                    and s.product_id = cp.producto_id
+                )::int venta
+          from costos_planificacion cp
+            join costos_productos pr
+              on pr.id = cp.producto_id
+          where extract(year from cp.fecha) = {anio}
+         union
+         select 999 as id,
+                'ÑzTOTAL' as producto_nombre,
+                to_char(fecha, 'YYYYMM') as codigo,
+                sum(cp.plan) as plan,
+                sum(cp.sistema) as sistema,
+                sum(cp.corregido) as corregido,
+                sum((select coalesce(sum(prod), 0)
+                   from costos_programacion s
+                  where extract(year from s.fecha) = extract(year from cp.fecha)
+                    and extract(month from s.fecha) = extract(month from cp.fecha)
+                    and s.producto_id = cp.producto_id
+                ))::int prod,
+                sum((select coalesce(sum(count), 0)
+                   from panacea_sales_v2 s
+                  where s.operation_year = extract(year from cp.fecha)
+                    and s.operation_month = extract(month from cp.fecha)
+                    and s.product_id = cp.producto_id
+                ))::int venta
+          from costos_planificacion cp
+            join costos_productos pr
+              on pr.id = cp.producto_id
+        where extract(year from cp.fecha) = {anio}
+        group by to_char(fecha, 'YYYYMM')
+        order by producto_nombre, codigo;
+    """
+    with connection.cursor() as cursor:
+        cursor.execute(sql)
+        result = _dictfetchall(cursor)
+
+    res = []
+    for k, g in itertools.groupby(result, lambda x: x.get("id")):
+        items = list(g)
+        item = {}
+        item["id"] = k
+        item["producto_nombre"] = items[0].get("producto_nombre")
+
+        for d in items:
+            item[f"{d.get('codigo')}-PLAN"] = d.get('plan')
+            item[f"{d.get('codigo')}-SISTEMA"] = d.get('sistema')
+            item[f"{d.get('codigo')}-CORREGIDO"] = d.get('corregido')
+            item[f"{d.get('codigo')}-PROD"] = d.get('prod')
+            item[f"{d.get('codigo')}-VENTA"] = d.get('venta')
+        res.append(item)
+
+    return JsonResponse(res, safe=False)
+
+
+def get_planning_columns(request):
+    anio = int(request.GET.get("anio", 2024))
+    sql = f"""
+         select distinct extract(month from cp.fecha) as mes,
+				case
+                    when extract(month from cp.fecha) = 1 then 'Enero'
+                    when extract(month from cp.fecha) = 2 then 'Febrero'
+                    when extract(month from cp.fecha) = 3 then 'Marzo'
+                    when extract(month from cp.fecha) = 4 then 'Abril'
+                    when extract(month from cp.fecha) = 5 then 'Mayo'
+                    when extract(month from cp.fecha) = 6 then 'Junio'
+                    when extract(month from cp.fecha) = 7 then 'Julio'
+                    when extract(month from cp.fecha) = 8 then 'Agosto'
+                    when extract(month from cp.fecha) = 9 then 'Septiembre'
+                    when extract(month from cp.fecha) = 10 then 'Octubre'
+                    when extract(month from cp.fecha) = 11 then 'Noviembre'
+                    when extract(month from cp.fecha) = 12 then 'Diciembre'
+                end as mes_del_anio,
+                to_char(fecha, 'YYYYMM') as codigo
+          from costos_planificacion cp
+            join costos_productos pr
+              on pr.id = cp.producto_id
+         where extract(year from cp.fecha) = {anio}
+        order by codigo;
+    """
+    with connection.cursor() as cursor:
+        cursor.execute(sql)
+        result = _dictfetchall(cursor)
+
+    res = [  {
+      "headerName": "",
+      "children": [
+        { "field": "id", "hide": True },
+        { "field": "producto", "hide": True },
+        {
+          "field": "producto_nombre",
+          "width": 200,
+          "headerName": "Producto",
+          "pinned": "left",
+        },
+      ],
+    }]
+
+    children = []
+    for d in result:
+        children.append({
+            "headerName": d.get("mes_del_anio"),
+            "children" : [
+                {
+                  "field": f"{d.get('codigo')}-PLAN",
+                  "editable": False,
+                  "headerName": "Plan",
+                  "cellStyle": { "backgroundColor": "silver" },
+                },
+                {
+                  "field": f"{d.get('codigo')}-SISTEMA",
+                  "editable": False,
+                  "headerName": "Sistema",
+                },
+                {
+                    "field": f"{d.get('codigo')}-CORREGIDO",
+                    "editable": True,
+                    "headerName": "Corr",
+                },
+                {
+                    "field": f"{d.get('codigo')}-PROD",
+                    "editable": False,
+                    "headerName": "Prod",
+                },
+                {
+                    "field": f"{d.get('codigo')}-VENTA",
+                    "editable": False,
+                    "headerName": "Venta",
+                },
+            ],
+        })
+    res.append(
+        {
+            "headerName": f"Anio {anio}",
+            "children": children
+        })
+
+    return JsonResponse(res, safe=False)
+
+
 def get_programacion(request, mes = 7, responsable = None, semana = 0):
     condition = ""
     if responsable is not None and responsable != "Todos":
