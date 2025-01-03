@@ -332,6 +332,7 @@ def get_programacion_columns(request):
     return JsonResponse(res, safe=False)
 
 def get_produccion_by_category(request):
+    anio = int(request.GET.get("anio", 2025))
     mes = int(request.GET.get("mes", "9"))
 
     sql = f"""
@@ -342,37 +343,26 @@ def get_produccion_by_category(request):
             pr.categoria,
             pr.responsable,
             sum(cp.prod) as prod,
-            extract(month from cp.fecha) as mes
+            extract(month from cp.fecha) as mes,
+            extract(year from cp.fecha) as anio
       from costos_programacion cp
         join costos_productos pr
           on pr.id = cp.producto_id
-    where extract(year from cp.fecha) = 2024
+    where extract(year from cp.fecha) = {anio}
       and extract(month from cp.fecha) = {mes}
-    group by pr.id, pr.ref_id, nombre, categoria, pr.responsable, extract(month from cp.fecha)),
+    group by pr.id, pr.ref_id, nombre, categoria, pr.responsable, extract(year from cp.fecha), extract(month from cp.fecha)),
     data as (select pr.nombre,
             pr.categoria,
             pr.responsable,
-            case
-                when pr.mes = 4 then p.apr2024
-                when pr.mes = 5 then p.may2024corr
-                when pr.mes = 6 then p.jun2024corr
-                when pr.mes = 7 then p.jul2024corr
-                when pr.mes = 8 then p.aug2024corr
-                when pr.mes = 9 then p.sep2024corr
-                when pr.mes = 10 then p.oct2024corr
-                when pr.mes = 11 then p.nov2024corr
-                when pr.mes = 12 then p.dec2024corr
-            end as plan,
+            (select max(plan) from costos_planificacion pl where pl.producto_id = pr.id and extract(year from fecha) = pr.anio and extract(month from fecha) = pr.mes) as plan,
             pr.prod,
             (select coalesce(sum(count), 0)
               from panacea_sales_v2 s
-             where s.operation_year = 2024
+             where s.operation_year = pr.anio
                and s.operation_month = pr.mes
                and s.product_id = pr.id
             )::int vendido
-      from prog pr
-        join planificacion2024 p
-            on p.codigo = pr.ref_id::int)
+      from prog pr)
     select categoria, 
             sum(plan)::int as planeado, 
             sum(prod)::int as producido,
@@ -392,6 +382,7 @@ def get_produccion_by_category(request):
     return JsonResponse(result, safe=False)
 
 def get_produccion_by_productos(request):
+    anio = int(request.GET.get("anio", 2025))
     mes = int(request.GET.get("mes", "9"))
 
     sql = f"""
@@ -402,33 +393,24 @@ def get_produccion_by_productos(request):
             pr.categoria,
             pr.responsable,
             sum(cp.prod) as prod,
-            extract(month from cp.fecha) as mes
+            extract(month from cp.fecha) as mes,
+            extract(year from cp.fecha) as anio
       from costos_programacion cp
         join costos_productos pr
           on pr.id = cp.producto_id
-    where extract(year from cp.fecha) = 2024
+    where extract(year from cp.fecha) = {anio}
       and extract(month from cp.fecha) = {mes}
-    group by pr.id, pr.ref_id, nombre, categoria, pr.responsable, extract(month from cp.fecha)),
+    group by pr.id, pr.ref_id, nombre, categoria, pr.responsable, extract(year from cp.fecha), extract(month from cp.fecha)),
     data as (select pr.nombre,
             pr.id,
             pr.mes,
             pr.categoria,
             pr.responsable,
-            case
-                when pr.mes = 4 then p.apr2024
-                when pr.mes = 5 then p.may2024corr
-                when pr.mes = 6 then p.jun2024corr
-                when pr.mes = 7 then p.jul2024corr
-                when pr.mes = 8 then p.aug2024corr
-                when pr.mes = 9 then p.sep2024corr
-                when pr.mes = 10 then p.oct2024corr
-                when pr.mes = 11 then p.nov2024corr
-                when pr.mes = 12 then p.dec2024corr
-            end as plan,
+            (select max(plan) from costos_planificacion pl where pl.producto_id = pr.id and extract(year from fecha) = pr.anio and extract(month from fecha) = pr.mes) as plan,
             pr.prod,
             (select coalesce(sum(count), 0)
               from panacea_sales_v2 s
-             where s.operation_year = 2024
+             where s.operation_year = pr.anio
                and s.operation_month = pr.mes
                and s.product_id = pr.id
             )::int vendido
@@ -457,6 +439,7 @@ def get_produccion_by_productos(request):
 
 
 def get_insumos_by_month(request):
+    anio = int(request.GET.get("anio", 2025))
     mes = int(request.GET.get("mes", "9"))
     semana = int(request.GET.get("semana", "0"))
     by_week = request.GET.get("by_week", "yes")
@@ -472,35 +455,24 @@ def get_insumos_by_month(request):
                 sum(cp.prod) as prod,
                 sum(cp.plan) as plan,
                 extract(month from cp.fecha) as mes,
-                extract('week' from fecha) - extract('week' from '2024-{str(mes).rjust(2, "0")}-02'::date) + 1 as semana
+                extract(year from cp.fecha) as anio,
+                extract('week' from fecha) - extract('week' from '{str(anio)}-{str(mes).rjust(2, "0")}-02'::date) + 1 as semana
           from costos_programacion cp
             join costos_productos pr
               on pr.id = cp.producto_id
-        where extract(year from cp.fecha) = 2024
+        where extract(year from cp.fecha) = {anio}
           and extract(month from cp.fecha) = {mes}
-        group by cp.producto_id, pr.id, pr.ref_id, nombre, categoria, pr.responsable, extract(month from cp.fecha), semana),
+        group by cp.producto_id, pr.id, pr.ref_id, nombre, categoria, pr.responsable, extract(year from cp.fecha), extract(month from cp.fecha), semana),
         data as (select pr.producto_id,
                 pr.nombre,
                 pr.categoria,
                 pr.responsable,
-                case
-                    when pr.mes = 4 then p.apr2024
-                    when pr.mes = 5 then p.may2024corr
-                    when pr.mes = 6 then p.jun2024corr
-                    when pr.mes = 7 then p.jul2024corr
-                    when pr.mes = 8 then p.aug2024corr
-                    when pr.mes = 9 then p.sep2024corr
-                    when pr.mes = 10 then p.oct2024corr
-                    when pr.mes = 11 then p.nov2024corr
-                    when pr.mes = 12 then p.dec2024corr
-                end as plan_mensual,
+                (select max(corregido) from costos_planificacion pl where pl.producto_id = pr.id and extract(year from fecha) = pr.anio and extract(month from fecha) = pr.mes) as plan_mensual,
                 pr.plan,
                 pr.prod,
                 mes,
                 semana
-          from prog pr
-            join planificacion2024 p
-                on p.codigo = pr.ref_id::int)
+          from prog pr)
                 """
     if by_week == "yes":
         sql = f"""
