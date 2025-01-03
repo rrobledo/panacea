@@ -24,6 +24,7 @@ router.register(r'productos', views_new.ProductosViewSet)
 router.register(r'clientes', views_new.ClientesViewSet)
 router.register(r'remitos', views_new.RemitosViewSet)
 router.register(r'programacion', views_new.ProgramacionViewSet, basename="programacion")
+router.register(r'planning', views_new.PlanificacionViewSet, basename="planning")
 
 costos_router = NestedSimpleRouter(router, r'productos', lookup='producto')
 costos_router.register(r'costos', views_new.CostosViewSet, basename='costos')
@@ -37,7 +38,6 @@ urlpatterns = [
     path('products/<str:product_code>/history', statistics.get_product_history, name='get_product_history'),
     path('products/<str:product_code>/cronograma', statistics.get_product_cronograma, name='get_product_cronograma'),
     path('cronograma/<int:week_of_month>', statistics.get_cronograma_by_week_of_month, name='get_cronograma_by_week_of_month'),
-    path('planning', produccion.get_planning, name='get_planning'),
     path('planning_columnas', produccion.get_planning_columns, name='planning_columnas'),
     path('programacion_columnas', produccion.get_programacion_columns, name='programacion_columnas'),
     path('categorias', get_categories),

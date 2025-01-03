@@ -1,11 +1,10 @@
 from django.db import connection
 from django.http import JsonResponse
 import itertools
-from .models import Programacion, Productos
+from .models import Programacion, Productos, Planificacion
 from datetime import datetime
 
-def get_planning(request):
-    anio = int(request.GET.get("anio", 2024))
+def get_planning(request, anio = 2025):
     sql = f"""
          select cp.producto_id as id,
                 pr.nombre as producto_nombre,
@@ -74,7 +73,7 @@ def get_planning(request):
             item[f"{d.get('codigo')}-VENTA"] = d.get('venta')
         res.append(item)
 
-    return JsonResponse(res, safe=False)
+    return res
 
 
 def get_planning_columns(request):
@@ -160,6 +159,28 @@ def get_planning_columns(request):
         })
 
     return JsonResponse(res, safe=False)
+
+
+def update_planificacion(data: []):
+    for item in data:
+        producto_id = item.get("id")
+        for key, value in item.items():
+            if key not in ('id'):
+                codigo, op = key.split('-')
+                fecha = datetime.strptime(f"{codigo}01", "%Y%m%d")
+                prog = Planificacion.objects.get(producto_id=producto_id, fecha=fecha)
+                if value == "":
+                    value = None
+                if op == 'PLAN':
+                    prog.plan = value
+                if op == 'SISTEMA':
+                    prog.sistema = value
+                if op == 'CORREGIDO':
+                    prog.corregido = value
+                if op == 'CORREGIDO':
+                    prog.corregido = value
+                prog.save()
+    pass
 
 
 def get_programacion(request, anio = 2025, mes = 7, responsable = None, semana = 0):
