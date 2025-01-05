@@ -23,6 +23,7 @@ class Productos(models.Model):
     tiempo_produccion = models.IntegerField(default=0)
     responsable = models.CharField(max_length=50, default="Todos")
     is_producto = models.BooleanField(default=True)
+    habilitado = models.BooleanField(default=True)
 
 
 class ProductosRef(models.Model):
