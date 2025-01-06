@@ -27,6 +27,7 @@ def get_planning(request, anio = 2025):
           from costos_planificacion cp
             join costos_productos pr
               on pr.id = cp.producto_id
+             and pr.habilitado = true
           where extract(year from cp.fecha) = {anio}
          union
          select 999 as id,
@@ -50,6 +51,7 @@ def get_planning(request, anio = 2025):
           from costos_planificacion cp
             join costos_productos pr
               on pr.id = cp.producto_id
+             and pr.habilitado = true
         where extract(year from cp.fecha) = {anio}
         group by to_char(fecha, 'YYYYMM')
         order by producto_nombre, codigo;
@@ -98,6 +100,7 @@ def get_planning_columns(request):
           from costos_planificacion cp
             join costos_productos pr
               on pr.id = cp.producto_id
+             and pr.habilitado = true
          where extract(year from cp.fecha) = {anio}
         order by codigo;
     """
@@ -201,8 +204,7 @@ def get_programacion(request, anio = 2025, mes = 7, responsable = None, semana =
           from costos_programacion cp
             join costos_productos pr
               on pr.id = cp.producto_id
-            join planificacion2024 p
-                on p.codigo = pr.ref_id::int
+             and pr.habilitado = true
          where extract(year from fecha) = {anio}
            and extract(month from fecha) = {mes} 
            and (
@@ -369,6 +371,7 @@ def get_produccion_by_category(request):
       from costos_programacion cp
         join costos_productos pr
           on pr.id = cp.producto_id
+         and pr.habilitado = true
     where extract(year from cp.fecha) = {anio}
       and extract(month from cp.fecha) = {mes}
     group by pr.id, pr.ref_id, nombre, categoria, pr.responsable, extract(year from cp.fecha), extract(month from cp.fecha)),
@@ -419,6 +422,7 @@ def get_produccion_by_productos(request):
       from costos_programacion cp
         join costos_productos pr
           on pr.id = cp.producto_id
+         and pr.habilitado = true
     where extract(year from cp.fecha) = {anio}
       and extract(month from cp.fecha) = {mes}
     group by pr.id, pr.ref_id, nombre, categoria, pr.responsable, extract(year from cp.fecha), extract(month from cp.fecha)),
@@ -481,6 +485,7 @@ def get_insumos_by_month(request):
           from costos_programacion cp
             join costos_productos pr
               on pr.id = cp.producto_id
+             and pr.habilitado = true
         where extract(year from cp.fecha) = {anio}
           and extract(month from cp.fecha) = {mes}
         group by cp.producto_id, pr.id, pr.ref_id, nombre, categoria, pr.responsable, extract(year from cp.fecha), extract(month from cp.fecha), semana),
@@ -508,6 +513,7 @@ def get_insumos_by_month(request):
                   from data d
                     join costos_productos p
                       on d.producto_id = p.id
+                     and pr.habilitado = true
                     join costos_costos cc
                       on d.producto_id = cc.producto_id
                     join costos_insumos ci
@@ -544,6 +550,7 @@ def get_insumos_by_month(request):
                   from data d
                     join costos_productos p
                       on d.producto_id = p.id
+                     and pr.habilitado = true
                     join costos_costos cc
                       on d.producto_id = cc.producto_id
                     join costos_insumos ci
