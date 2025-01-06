@@ -5,6 +5,7 @@ from .models import Programacion, Productos
 from datetime import datetime
 
 def get_ventas_por_cliente(request):
+    anio = int(request.GET.get("anio", 2025))
     mes = int(request.GET.get("mes", "9"))
     cliente = request.GET.get("cliente", "Todos")
 
@@ -33,7 +34,7 @@ def get_ventas_por_cliente(request):
                sum(case when operation_hour between 15 and 21 then subtotal else 0 end) as subtotal_tarde,
                count(distinct document_id) as count
            from panacea_sales
-          where date_part('YEAR', date(operation_date)) = 2024
+          where date_part('YEAR', date(operation_date)) = {anio}
             and ({mes} = 0 or date_part('MONTH', date(operation_date)) = {mes}) 
           group by 1, customer_id, customer
           ), 
