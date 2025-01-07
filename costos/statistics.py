@@ -815,11 +815,13 @@ def get_precio_productos(request):
                 prod["costo_total"] = prod["costo_unitario_mp"] + prod["costo_unitario_fab"]
                 if prod["precio_va"] and prod["costo_total"] > 0:
                     prod["porcentaje_va"] = round(((prod["precio_va"] / prod["costo_total"]) - 1) * 100, 2)
+                    prod["ganancia_va"] = round(prod["precio_va"] - prod["costo_total"], 2)
                 else:
                     prod["precio_va"] = 0
                     prod["porcentaje_va"] = None
                 if prod["precio_cp"] and prod["costo_total"] > 0:
                     prod["porcentaje_cp"] = round(((prod["precio_cp"] / prod["costo_total"]) - 1) * 100, 2)
+                    prod["ganancia_cp"] = round(prod["ganancia_cp"] - prod["costo_total"], 2)
                 else:
                     prod["precio_cp"] = 0
                     prod["porcentaje_cp"] = None
