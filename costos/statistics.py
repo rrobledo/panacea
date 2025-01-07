@@ -798,11 +798,11 @@ def get_precio_productos(request):
                 where cp.producto_id = p.id
                 order by af.idarticulo 
                 limit 1)::float as precio_cp,
-                (select corregido
+                coalesce((select corregido
                   from costos_planificacion pl
                  where pl.producto_id = p.id
                    and extract(year from pl.fecha) = extract(year from current_date)
-                   and extract(month from pl.fecha) = extract(month from current_date)) as plan
+                   and extract(month from pl.fecha) = extract(month from current_date)), 0) as plan
           from costos_productos p 
         order by 2    
     """
