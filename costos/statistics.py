@@ -797,7 +797,12 @@ def get_precio_productos(request):
                      and af.activo = 1
                 where cp.producto_id = p.id
                 order by af.idarticulo 
-                limit 1)::float as precio_cp
+                limit 1)::float as precio_cp,
+                (select corregido
+                  from costos_planificacion pl
+                 where pl.producto_id = p.id
+                   and extract(year from pl.fecha) = extract(year from current_date)
+                   and extract(month from pl.fecha) = extract(month from current_date)) as plan
           from costos_productos p 
         order by 2    
     """
@@ -832,9 +837,30 @@ def get_precio_productos(request):
                     prod["precio_cp"] = 0
                     prod["porcentaje_cp"] = None
                     prod["ganancia_cp"] = 0
+                prod["ganancia_fab"] = prod.get("plan", 0) * prod["ganancia_va"] * 0.8
             pass
         finally:
             pass
+
+    ganancial_total_fab = sum(
+        [int(d.get("ganancia_fab", 0)) if d.get("ganancia_fab") != '' and d.get("ganancia_fab") is not None else 0 for d
+         in data])
+
+    data.append(
+        {
+            "producto_id": 0,
+            "producto_name": "TOTALES",
+            "precio_va": 0,
+            "precio_cp": 0,
+            "costo_unitario_mp": 0,
+            "costo_unitario_fab": 0,
+            "costo_total": 0,
+            "porcentaje_va": 0,
+            "ganancia_va": 0,
+            "porcentaje_cp": 0,
+            "ganancia_cp": 0,
+            "ganancia_fab": ganancial_total_fab
+        })
 
     return JsonResponse(data, safe=False)
 
