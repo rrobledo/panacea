@@ -62,6 +62,7 @@ def get_cost_by_product(request, producto_id):
         "prod_utilidad_mensual": prod_utilidad_mensual,
         "total_utilidad_mensual": total_utilidad_mensual,
         "utilidad_mensual": utilidad_mensual,
+        "lotes_mensuales": lotes_mensuales,
         "detalle_costo": sorted([gen_costs(d, cantidad_lotes, sum_cost) for d in cost_detail], key=lambda x: x.get("porcentaje_del_total"), reverse=True)
     }
     return JsonResponse(response)
@@ -756,320 +757,75 @@ def get_planning(request):
     return JsonResponse(planning, safe=False)
 
 
-def get_planning_2024(request):
-    sql = f"""
-            with planning as (
-                    select p.codigo as product_id, 
-                           case when pr.nombre is null then concat(p.productos) else pr.nombre end product_name,
-                           jan2024 as enero_plan,
-                           (select coalesce(sum(count), 0)
-                              from panacea_sales_v2 s
-                             where s.operation_year = 2024
-                               and s.operation_month = 1
-                               and s.product_id = p.producto_id
-                             )::int enero_venta,
-                           feb2024 as febrero,
-                           (select coalesce(sum(count), 0)
-                              from panacea_sales_v2 s
-                             where s.operation_year = 2024
-                               and s.operation_month = 2
-                               and s.product_id = p.producto_id
-                             )::int febrero_venta, 
-                           mar2024 as marzo,
-                           (select coalesce(sum(count), 0)
-                              from panacea_sales_v2 s
-                             where s.operation_year = 2024
-                               and s.operation_month = 3
-                               and s.product_id = p.producto_id
-                             )::int marzo_venta, 
-                           apr2024 as abril,
-                           (select coalesce(sum(prod), 0)
-                              from costos_programacion s
-                                join costos_productos cp
-                                  on s.producto_id = cp.id
-                             where extract(year from s.fecha) = 2024
-                               and extract(month from s.fecha) = 4
-                               and cp.ref_id::int = p.codigo
-                           )::int abril_prod,
-                           (select coalesce(sum(count), 0)
-                              from panacea_sales_v2 s
-                             where s.operation_year = 2024
-                               and s.operation_month = 4
-                               and s.product_id = p.producto_id
-                             )::int abril_venta,
-                           may2024 as mayo,
-                           may2024corr as mayo_corregido,
-                           (select coalesce(sum(prod), 0)
-                              from costos_programacion s
-                                join costos_productos cp
-                                  on s.producto_id = cp.id
-                             where extract(year from s.fecha) = 2024
-                               and extract(month from s.fecha) = 5
-                               and cp.ref_id::int = p.codigo
-                           )::int mayo_prod,
-                           (select coalesce(sum(count), 0)
-                              from panacea_sales_v2 s
-                             where s.operation_year = 2024
-                               and s.operation_month = 5
-                               and s.product_id = p.producto_id
-                           )::int mayo_venta,
-                           jun2024 as junio,
-                           jun2024corr as junio_corregido,
-                           (select coalesce(sum(prod), 0)
-                              from costos_programacion s
-                                join costos_productos cp
-                                  on s.producto_id = cp.id
-                             where extract(year from s.fecha) = 2024
-                               and extract(month from s.fecha) = 6
-                               and cp.ref_id::int = p.codigo
-                           )::int junio_prod,
-                           (select coalesce(sum(count), 0)
-                              from panacea_sales_v2 s
-                             where s.operation_year = 2024
-                               and s.operation_month = 6
-                               and s.product_id = p.producto_id
-                           )::int junio_venta,
-                           jul2024 as julio,
-                           jul2024corr as julio_corregido,
-                           (select coalesce(sum(prod), 0)
-                              from costos_programacion s
-                                join costos_productos cp
-                                  on s.producto_id = cp.id
-                             where extract(year from s.fecha) = 2024
-                               and extract(month from s.fecha) = 7
-                               and cp.ref_id::int = p.codigo
-                           )::int julio_prod,
-                           (select coalesce(sum(count), 0)
-                              from panacea_sales_v2 s
-                             where s.operation_year = 2024
-                               and s.operation_month = 7
-                               and s.product_id = p.producto_id
-                           )::int julio_venta,
-                           aug2024 as agosto,
-                           aug2024corr as agosto_corregido,
-                           (select coalesce(sum(prod), 0)
-                              from costos_programacion s
-                                join costos_productos cp
-                                  on s.producto_id = cp.id
-                             where extract(year from s.fecha) = 2024
-                               and extract(month from s.fecha) = 8
-                               and cp.ref_id::int = p.codigo
-                           )::int agosto_prod,
-                           (select coalesce(sum(count), 0)
-                              from panacea_sales_v2 s
-                             where s.operation_year = 2024
-                               and s.operation_month = 8
-                               and s.product_id = p.producto_id
-                           )::int agosto_venta,
-                           sep2024 as septiembre,
-                           sep2024corr as septiembre_corregido,
-                           (select coalesce(sum(prod), 0)
-                              from costos_programacion s
-                                join costos_productos cp
-                                  on s.producto_id = cp.id
-                             where extract(year from s.fecha) = 2024
-                               and extract(month from s.fecha) = 9
-                               and cp.ref_id::int = p.codigo
-                           )::int septiembre_prod,
-                           (select coalesce(sum(count), 0)
-                              from panacea_sales_v2 s
-                             where s.operation_year = 2024
-                               and s.operation_month = 9
-                               and s.product_id = p.producto_id
-                           )::int septiembre_venta,
-                           oct2024 as octubre,
-                           oct2024corr as octubre_corregido,
-                           (select coalesce(sum(prod), 0)
-                              from costos_programacion s
-                                join costos_productos cp
-                                  on s.producto_id = cp.id
-                             where extract(year from s.fecha) = 2024
-                               and extract(month from s.fecha) = 10
-                               and cp.ref_id::int = p.codigo
-                           )::int octubre_prod,
-                           (select coalesce(sum(count), 0)
-                              from panacea_sales_v2 s
-                             where s.operation_year = 2024
-                               and s.operation_month = 10
-                               and s.product_id = p.producto_id
-                           )::int octubre_venta,
-                           nov2024 as noviembre,
-                           nov2024corr as noviembre_corregido,
-                           (select coalesce(sum(prod), 0)
-                              from costos_programacion s
-                                join costos_productos cp
-                                  on s.producto_id = cp.id
-                             where extract(year from s.fecha) = 2024
-                               and extract(month from s.fecha) = 11
-                               and cp.ref_id::int = p.codigo
-                           )::int noviembre_prod,
-                           (select coalesce(sum(count), 0)
-                              from panacea_sales_v2 s
-                             where s.operation_year = 2024
-                               and s.operation_month = 11
-                               and s.product_id = p.producto_id
-                           )::int noviembre_venta,
-                           dec2024 as diciembre,
-                           dec2024corr as diciembre_corregido,
-                           (select coalesce(sum(prod), 0)
-                              from costos_programacion s
-                                join costos_productos cp
-                                  on s.producto_id = cp.id
-                             where extract(year from s.fecha) = 2024
-                               and extract(month from s.fecha) = 12
-                               and cp.ref_id::int = p.codigo
-                           )::int diciembre_prod,
-                           (select coalesce(sum(count), 0)
-                              from panacea_sales_v2 s
-                             where s.operation_year = 2024
-                               and s.operation_month = 12
-                               and s.product_id = p.producto_id
-                           )::int diciembre_venta
-                      from planificacion2024 p 
-                        left outer join costos_productos pr
-                          on p.codigo::int = pr.ref_id::int
-                     where p.productos not in ('Total unidades')), 
-            planning_total as (
-                    select product_id as ref_id,
-                          product_name as producto,
-                          enero_plan,
-                          enero_venta,
-                          febrero,
-                          febrero_venta,
-                          marzo,
-                          marzo_venta,
-                          abril,
-                          abril_prod,
-                          abril_venta,
-                          mayo,
-                          mayo_corregido,
-                          mayo_prod,
-                          mayo_venta,
-                          junio,
-                          junio_corregido,
-                          junio_prod,
-                          junio_venta,
-                          julio,
-                          julio_corregido,
-                          julio_venta,
-                          julio_prod,
-                          agosto,
-                          agosto_prod,
-                          agosto_venta,
-                          agosto_corregido,
-                          septiembre,
-                          septiembre_corregido,
-                          septiembre_prod,
-                          septiembre_venta,
-                          octubre,
-                          octubre_corregido,
-                          octubre_prod,
-                          octubre_venta,
-                          noviembre,
-                          noviembre_corregido,
-                          noviembre_prod,
-                          noviembre_venta,
-                          diciembre,
-                          diciembre_corregido,
-                          diciembre_prod,
-                          diciembre_venta
-                      from planning)
-            select ref_id,
-                    producto,
-                    enero_plan,
-                    enero_venta,
-                    febrero,
-                    febrero_venta,
-                    marzo,
-                    marzo_venta,
-                    abril,
-                    abril_prod,
-                    abril_venta,
-                    mayo,
-                    mayo_corregido,
-                    mayo_prod,
-                    mayo_venta,
-                    junio,
-                    junio_corregido,
-                    junio_prod,
-                    junio_venta,
-                    julio,
-                    julio_corregido,
-                    julio_prod,
-                    julio_venta,
-                    agosto,
-                    agosto_prod,
-                    agosto_venta,
-                    agosto_corregido,
-                    septiembre,
-                    septiembre_corregido,
-                    septiembre_prod,
-                    septiembre_venta,
-                    octubre,
-                    octubre_corregido,
-                    octubre_prod,
-                    octubre_venta,
-                    noviembre,
-                    noviembre_corregido,
-                    noviembre_prod,
-                    noviembre_venta,
-                    diciembre,
-                    diciembre_corregido,
-                    diciembre_prod,
-                    diciembre_venta
-              from planning_total
-            union
-            select null as ref_id,
-                  null as producto,
-                  sum(enero_plan),
-                  sum(enero_venta),
-                  sum(febrero),
-                  sum(febrero_venta),
-                  sum(marzo),
-                  sum(marzo_venta),
-                  sum(abril),
-                  sum(abril_prod),
-                  sum(abril_venta),
-                  sum(mayo),
-                  sum(mayo_corregido),
-                  sum(mayo_prod),
-                  sum(mayo_venta),
-                  sum(junio),
-                  sum(junio_corregido),
-                  sum(junio_prod),
-                  sum(junio_venta),
-                  sum(julio),
-                  sum(julio_corregido),
-                  sum(julio_prod),
-                  sum(julio_venta),
-                  sum(agosto),
-                  sum(agosto_prod),
-                  sum(agosto_venta),
-                  sum(agosto_corregido),      
-                  sum(septiembre),
-                  sum(septiembre_corregido),
-                  sum(septiembre_prod),
-                  sum(septiembre_venta),
-                  sum(octubre),
-                  sum(octubre_corregido),
-                  sum(octubre_prod),
-                  sum(octubre_venta),
-                  sum(noviembre),
-                  sum(noviembre_corregido),
-                  sum(noviembre_prod),
-                  sum(noviembre_venta),
-                  sum(diciembre),
-                  sum(diciembre_corregido),
-                  sum(diciembre_prod),
-                  sum(diciembre_venta)
-              from planning_total
-            order by 2;
+def get_precios_en_locales(request):
+
+    sql = """
+        select p.id as producto_id, 
+               p.nombre as producto_nombre,
+               (select af.nombre
+                 from costos_productosref cp  
+                    join articulos_final af 
+                      on cp.ref_id::int = af.idarticulo 
+                     and af.idarticulo < 2000
+                     and af.activo = 1
+                where cp.producto_id = p.id
+                order by af.idarticulo 
+                limit 1) as articulo_va,
+                (select af.nombre
+                 from costos_productosref cp  
+                    join articulos_final af 
+                      on cp.ref_id::int = af.idarticulo 
+                     and af.idarticulo >= 2000
+                     and af.activo = 1
+                where cp.producto_id = p.id
+                order by af.idarticulo 
+                limit 1) as articulo_cp,
+                (select af.precio
+                 from costos_productosref cp  
+                    join articulos_final af 
+                      on cp.ref_id::int = af.idarticulo 
+                     and af.idarticulo < 2000
+                     and af.activo = 1
+                where cp.producto_id = p.id
+                order by af.idarticulo 
+                limit 1)::float as precio_va,
+                (select af.precio
+                 from costos_productosref cp  
+                    join articulos_final af 
+                      on cp.ref_id::int = af.idarticulo 
+                     and af.idarticulo >= 2000
+                     and af.activo = 1
+                where cp.producto_id = p.id
+                order by af.idarticulo 
+                limit 1)::float as precio_cp
+          from costos_productos p 
+        order by 2    
     """
     with connection.cursor() as cursor:
         cursor.execute(sql)
-        result = _dictfetchall(cursor)
+        data = _dictfetchall(cursor)
 
-    return JsonResponse(result, safe=False)
+    for prod in data:
+        try:
+            if prod.get("producto_id"):
+                ret = get_cost_by_product(request, prod.get("producto_id"))
+                prod_cost = json.loads(ret.content)
+                prod["costo_unitario_mp"] = prod_cost.get("costo_unitario_mp")
+                prod["costo_unitario_fab"] = round(COSTO_TOTAL_FABRICA / (prod_cost.get("lotes_mensuales") * prod_cost.get("lote_produccion")), 2)
+                prod["costo_total"] = prod["costo_unitario_mp"] + prod["costo_unitario_fab"]
+                if prod["precio_va"] and prod["costo_total"] > 0:
+                    prod["porcentaje_va"] = round(((prod["precio_va"] / prod["costo_total"]) - 1) * 100, 2)
+                else:
+                    prod["porcentaje_va"] = None
+                if prod["precio_cp"] and prod["costo_total"] > 0:
+                    prod["porcentaje_cp"] = round(((prod["precio_cp"] / prod["costo_total"]) - 1) * 100, 2)
+                else:
+                    prod["porcentaje_cp"] = None
+            pass
+        finally:
+            pass
+
+    return JsonResponse(data, safe=False)
 
 
 def _dictfetchall(cursor):
