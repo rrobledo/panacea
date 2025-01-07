@@ -42,7 +42,7 @@ urlpatterns = [
     path('categorias', get_categories),
     path('get_produccion_by_category', produccion.get_produccion_by_category, name='get_produccion_by_category'),
     path('get_produccion_by_productos', produccion.get_produccion_by_productos, name='get_produccion_by_productos'),
-    path('precio_productos', statistics.precio_productos, name='precio_productos'),
+    path('precio_productos', statistics.get_precio_productos, name='precio_productos'),
     path('get_insumos_by_month', produccion.get_insumos_by_month, name='get_insumos_by_month'),
     path('get_ventas_por_cliente', ventas.get_ventas_por_cliente, name='get_ventas_por_cliente'),
 ]
