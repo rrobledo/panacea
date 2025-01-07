@@ -760,6 +760,7 @@ def get_planning(request):
 def get_precio_productos(request):
 
     sql = """
+        with t as (
         select p.id as producto_id, 
                p.nombre as producto_nombre,
                (select af.nombre
@@ -802,8 +803,24 @@ def get_precio_productos(request):
                   from costos_planificacion pl
                  where pl.producto_id = p.id
                    and extract(year from pl.fecha) = extract(year from current_date)
-                   and extract(month from pl.fecha) = extract(month from current_date)), 0) as plan
-          from costos_productos p 
+                   and extract(month from pl.fecha) = extract(month from current_date)), 0) as plan,
+                p.precio_actual
+           from costos_productos p 
+        )
+        select producto_id,
+               producto_nombre,
+               articulo_va,
+               articulo_cp,
+               case 
+                when precio_va = 0 then precio_actual
+                else precio_va
+               end as precio_va,
+               case 
+                when precio_cp = 0 then precio_actual
+                else precio_cp
+               end as precio_cp,
+               plan
+         from t
         order by 2    
     """
     with connection.cursor() as cursor:
