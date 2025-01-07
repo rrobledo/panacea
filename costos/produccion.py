@@ -513,7 +513,7 @@ def get_insumos_by_month(request):
                   from data d
                     join costos_productos p
                       on d.producto_id = p.id
-                     and pr.habilitado = true
+                     and p.habilitado = true
                     join costos_costos cc
                       on d.producto_id = cc.producto_id
                     join costos_insumos ci
@@ -550,7 +550,7 @@ def get_insumos_by_month(request):
                   from data d
                     join costos_productos p
                       on d.producto_id = p.id
-                     and pr.habilitado = true
+                     and p.habilitado = true
                     join costos_costos cc
                       on d.producto_id = cc.producto_id
                     join costos_insumos ci
