@@ -757,7 +757,7 @@ def get_planning(request):
     return JsonResponse(planning, safe=False)
 
 
-def get_precios_en_locales(request):
+def get_precio_productos(request):
 
     sql = """
         select p.id as producto_id, 
