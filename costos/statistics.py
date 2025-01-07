@@ -813,18 +813,25 @@ def get_precio_productos(request):
                 prod["costo_unitario_mp"] = prod_cost.get("costo_unitario_mp")
                 prod["costo_unitario_fab"] = round(COSTO_TOTAL_FABRICA / (prod_cost.get("lotes_mensuales") * prod_cost.get("lote_produccion")), 2)
                 prod["costo_total"] = prod["costo_unitario_mp"] + prod["costo_unitario_fab"]
+
                 if prod["precio_va"] and prod["costo_total"] > 0:
                     prod["porcentaje_va"] = round(((prod["precio_va"] / prod["costo_total"]) - 1) * 100, 2)
                     prod["ganancia_va"] = round(prod["precio_va"] - prod["costo_total"], 2)
+                    if not prod["ganancia_va"]:
+                        prod["ganancia_va"] = 0
                 else:
                     prod["precio_va"] = 0
                     prod["porcentaje_va"] = None
+                    prod["ganancia_va"] = 0
                 if prod["precio_cp"] and prod["costo_total"] > 0:
                     prod["porcentaje_cp"] = round(((prod["precio_cp"] / prod["costo_total"]) - 1) * 100, 2)
                     prod["ganancia_cp"] = round(prod["precio_cp"] - prod["costo_total"], 2)
+                    if not prod["ganancia_cp"]:
+                        prod["ganancia_cp"] = 0
                 else:
                     prod["precio_cp"] = 0
                     prod["porcentaje_cp"] = None
+                    prod["ganancia_cp"] = 0
             pass
         finally:
             pass
