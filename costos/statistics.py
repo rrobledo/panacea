@@ -837,7 +837,10 @@ def get_precio_productos(request):
                     prod["precio_cp"] = 0
                     prod["porcentaje_cp"] = None
                     prod["ganancia_cp"] = 0
-                prod["ganancia_fab"] = prod.get("plan", 0) * prod["ganancia_va"] * 0.8
+                if prod["ganancia_va"]:
+                    prod["ganancia_fab"] = prod.get("plan", 0) * prod["ganancia_va"] * 0.8
+                else:
+                    prod["ganancia_fab"] = 0
             pass
         finally:
             pass
