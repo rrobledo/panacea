@@ -816,10 +816,12 @@ def get_precios_en_locales(request):
                 if prod["precio_va"] and prod["costo_total"] > 0:
                     prod["porcentaje_va"] = round(((prod["precio_va"] / prod["costo_total"]) - 1) * 100, 2)
                 else:
+                    prod["precio_va"] = 0
                     prod["porcentaje_va"] = None
                 if prod["precio_cp"] and prod["costo_total"] > 0:
                     prod["porcentaje_cp"] = round(((prod["precio_cp"] / prod["costo_total"]) - 1) * 100, 2)
                 else:
+                    prod["precio_cp"] = 0
                     prod["porcentaje_cp"] = None
             pass
         finally:
