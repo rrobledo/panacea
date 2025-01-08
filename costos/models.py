@@ -24,6 +24,7 @@ class Productos(models.Model):
     responsable = models.CharField(max_length=50, default="Todos")
     is_producto = models.BooleanField(default=True)
     habilitado = models.BooleanField(default=True)
+    prioridad = models.IntegerField(default=10)
 
 
 class ProductosRef(models.Model):

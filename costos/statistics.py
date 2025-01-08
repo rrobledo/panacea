@@ -761,7 +761,8 @@ def get_precio_productos(request):
 
     sql = """
         with t as (
-        select p.id as producto_id, 
+        select p.id as producto_id,
+               p.prioridad as prioridad, 
                p.nombre as producto_nombre,
                (select af.nombre
                  from costos_productosref cp  
@@ -822,7 +823,7 @@ def get_precio_productos(request):
                end as precio_cp,
                plan
          from t
-        order by 2    
+        order by prioridad, producto_nombre   
     """
     with connection.cursor() as cursor:
         cursor.execute(sql)

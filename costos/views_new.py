@@ -41,7 +41,7 @@ class ProductosViewSet(viewsets.ModelViewSet):
         name = self.request.query_params.get('nombre')
         if name is not None:
             return Productos.objects.order_by("nombre").filter(nombre__icontains=name)
-        return Productos.objects.order_by("nombre").all()
+        return Productos.objects.order_by("prioridad", "nombre").all()
 
 
 class CostosViewSet(viewsets.ModelViewSet):

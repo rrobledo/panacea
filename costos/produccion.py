@@ -7,6 +7,7 @@ from datetime import datetime
 def get_planning(request, anio = 2025):
     sql = f"""
          select cp.producto_id as id,
+                pr.prioridad as prioridad,
                 pr.nombre as producto_nombre,
                 to_char(fecha, 'YYYYMM') as codigo,
                 cp.plan,
@@ -31,7 +32,8 @@ def get_planning(request, anio = 2025):
           where extract(year from cp.fecha) = {anio}
          union
          select 999 as id,
-                'ÑzTOTAL' as producto_nombre,
+                999 as prioridad,
+                'TOTAL' as producto_nombre,
                 to_char(fecha, 'YYYYMM') as codigo,
                 sum(cp.plan) as plan,
                 sum(cp.sistema) as sistema,
@@ -54,7 +56,7 @@ def get_planning(request, anio = 2025):
              and pr.habilitado = true
         where extract(year from cp.fecha) = {anio}
         group by to_char(fecha, 'YYYYMM')
-        order by producto_nombre, codigo;
+        order by prioridad, producto_nombre, codigo;
     """
     with connection.cursor() as cursor:
         cursor.execute(sql)
