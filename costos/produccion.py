@@ -197,6 +197,7 @@ def get_programacion(request, anio = 2025, mes = 7, responsable = None, semana =
 
     sql = f"""
          select cp.producto_id as id,
+                pr.prioridad as prioridad,
                 case when pr.nombre is null then cp.producto_nombre else pr.nombre end as producto_nombre,
                 (select max(corregido) from costos_planificacion pl where pl.producto_id = cp.producto_id and  extract(year from pl.fecha) = extract(year from cp.fecha) and extract(month from pl.fecha) = extract(month from cp.fecha)) as planeado,
                 pr.responsable,
@@ -217,7 +218,7 @@ def get_programacion(request, anio = 2025, mes = 7, responsable = None, semana =
                end = {semana}
            )
          {condition}
-         order by producto_nombre, codigo;
+         order by prioridad, producto_nombre, codigo;
     """
     with connection.cursor() as cursor:
         cursor.execute(sql)
