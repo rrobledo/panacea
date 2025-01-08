@@ -805,7 +805,8 @@ def get_precio_productos(request):
                    and extract(year from pl.fecha) = extract(year from current_date)
                    and extract(month from pl.fecha) = extract(month from current_date)), 0) as plan,
                 p.precio_actual
-           from costos_productos p 
+           from costos_productos p
+          where p.habilitado = true 
         )
         select producto_id,
                producto_nombre,
