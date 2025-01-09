@@ -381,7 +381,7 @@ def get_produccion_by_category(request):
     data as (select pr.nombre,
             pr.categoria,
             pr.responsable,
-            (select max(plan) from costos_planificacion pl where pl.producto_id = pr.id and extract(year from fecha) = pr.anio and extract(month from fecha) = pr.mes) as plan,
+            (select max(corregido) from costos_planificacion pl where pl.producto_id = pr.id and extract(year from fecha) = pr.anio and extract(month from fecha) = pr.mes) as plan,
             pr.prod,
             (select coalesce(sum(count), 0)
               from panacea_sales_v2 s
@@ -434,7 +434,7 @@ def get_produccion_by_productos(request):
             pr.mes,
             pr.categoria,
             pr.responsable,
-            (select max(plan) from costos_planificacion pl where pl.producto_id = pr.id and extract(year from fecha) = pr.anio and extract(month from fecha) = pr.mes) as plan,
+            (select max(corregido) from costos_planificacion pl where pl.producto_id = pr.id and extract(year from fecha) = pr.anio and extract(month from fecha) = pr.mes) as plan,
             pr.prod,
             (select coalesce(sum(count), 0)
               from panacea_sales_v2 s
