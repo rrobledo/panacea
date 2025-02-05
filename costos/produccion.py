@@ -317,6 +317,12 @@ def get_programacion_columns(request):
           "pinned": "left",
         },
         {
+          "field": "venta",
+          "width": 70,
+          "headerName": "Venta",
+          "pinned": "left",
+        },
+        {
           "field": "planeado",
           "width": 70,
           "headerName": "Plan",
