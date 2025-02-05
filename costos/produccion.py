@@ -201,6 +201,12 @@ def get_programacion(request, anio = 2025, mes = 7, responsable = None, semana =
                 case when pr.nombre is null then cp.producto_nombre else pr.nombre end as producto_nombre,
                 (select max(corregido) from costos_planificacion pl where pl.producto_id = cp.producto_id and  extract(year from pl.fecha) = extract(year from cp.fecha) and extract(month from pl.fecha) = extract(month from cp.fecha)) as planeado,
                 pr.responsable,
+                (select coalesce(sum(count), 0)
+                   from panacea_sales_v2 s
+                  where s.operation_year = extract(year from cp.fecha)
+                    and s.operation_month = extract(month from cp.fecha)
+                    and s.product_id = cp.producto_id
+                )::int venta,
                 to_char(fecha, 'YYYYMMDD') as codigo,
                 cp.plan,
                 cp.prod
@@ -232,6 +238,7 @@ def get_programacion(request, anio = 2025, mes = 7, responsable = None, semana =
         item["producto_nombre"] = items[0].get("producto_nombre")
         item["planeado"] = items[0].get("planeado")
         item["responsable"] = items[0].get("responsable")
+        item["venta"] = items[0].get("venta")
 
         for d in items:
             item[f"{d.get('codigo')}-P"] = d.get('plan')

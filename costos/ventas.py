@@ -33,7 +33,7 @@ def get_ventas_por_cliente(request):
                sum(case when operation_hour between 8 and 15 then subtotal else 0 end) as subtotal_maniana,
                sum(case when operation_hour between 15 and 21 then subtotal else 0 end) as subtotal_tarde,
                count(distinct document_id) as count
-           from panacea_sales
+           from panacea_sales_v2
           where date_part('YEAR', date(operation_date)) = {anio}
             and ({mes} = 0 or date_part('MONTH', date(operation_date)) = {mes}) 
           group by 1, customer_id, customer
