@@ -821,6 +821,7 @@ def get_precio_productos(request):
                 p.precio_actual
            from costos_productos p
           where p.habilitado = true 
+            and p.is_producto = true
         )
         select producto_id,
                producto_nombre,
