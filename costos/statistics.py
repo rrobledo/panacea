@@ -853,6 +853,7 @@ def get_precio_productos(request):
                 prod["costo_unitario_fab"] = round(settings.COSTO_TOTAL_FABRICA / (prod_cost.get("lotes_mensuales") * prod_cost.get("lote_produccion")), 2)
                 prod["costo_total"] = prod["costo_unitario_mp"] + prod["costo_unitario_fab"]
                 prod["costo_total_new"] = prod["costo_unitario_mp"] + prod["costo_unitario_mo"] + prod["costo_unitario_fab_new"]
+                prod["precio_sugerido"] = prod["costo_total_new"] / 0.70
 
                 if prod["precio_va"] and prod["costo_total"] > 0:
                     prod["porcentaje_va"] = round(((prod["precio_va"] / prod["costo_total"]) - 1) * 100, 2)
