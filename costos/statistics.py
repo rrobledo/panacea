@@ -842,7 +842,7 @@ def get_precio_productos(request):
         cursor.execute(sql)
         data = _dictfetchall(cursor)
 
-    for prod in data[0:2]:
+    for prod in data:
         try:
             if prod.get("producto_id"):
                 ret = get_cost_by_product(request, prod.get("producto_id"))
