@@ -904,7 +904,7 @@ def get_precio_productos(request):
          in data])
 
     ganancial_total_fab_new = sum(
-        [int(d.get("ganancia", 0)) if d.get("ganancia") != '' and d.get("ganancia") is not None else 0 for d
+        [int(d.get("ganancia_fab_new", 0)) if d.get("ganancia_fab_new") != '' and d.get("ganancia_fab_new") is not None else 0 for d
          in data])
 
     data.append(
