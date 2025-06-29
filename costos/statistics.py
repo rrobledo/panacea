@@ -877,12 +877,27 @@ def get_precio_productos(request):
                     prod["ganancia_fab"] = prod.get("plan", 0) * prod["ganancia_va"] * 0.8
                 else:
                     prod["ganancia_fab"] = 0
+
+                if prod["precio_sugerido"] and prod["costo_total"] > 0:
+                    prod["porcentaje"] = round(((prod["precio_sugerido"] / prod["costo_total_new"]) - 1) * 100, 2)
+                    prod["ganancia"] = round(prod["precio_sugerido"] - prod["costo_total_new"], 2)
+                    if not prod["ganancia"]:
+                        prod["ganancia"] = 0
+                else:
+                    prod["precio_sugerido"] = 0
+                    prod["porcentaje"] = None
+                    prod["ganancia"] = 0
+
             pass
         finally:
             pass
 
     ganancial_total_fab = sum(
         [int(d.get("ganancia_fab", 0)) if d.get("ganancia_fab") != '' and d.get("ganancia_fab") is not None else 0 for d
+         in data])
+
+    ganancial_total_fab_new = sum(
+        [int(d.get("ganancia", 0)) if d.get("ganancia") != '' and d.get("ganancia") is not None else 0 for d
          in data])
 
     data.append(
@@ -901,7 +916,10 @@ def get_precio_productos(request):
             "ganancia_va": 0,
             "porcentaje_cp": 0,
             "ganancia_cp": 0,
-            "ganancia_fab": ganancial_total_fab
+            "porcentaje": 0,
+            "ganancia": 0,
+            "ganancia_fab": ganancial_total_fab,
+            "ganancia_fab_new": ganancial_total_fab_new
         })
 
     return JsonResponse(data, safe=False)
