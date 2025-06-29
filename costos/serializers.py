@@ -98,7 +98,9 @@ class RemitosSerializer(serializers.HyperlinkedModelSerializer):
         return remito
 
     def update(self, remito, validated_data):
+        productos = RemitoDetalles.objects.filter(remito_id=remito.id)
         productos_data = validated_data.pop('productos')
+        diff = productos - productos_data
 
         return  remito
 

@@ -1,7 +1,8 @@
 from django.db import connection
 from django.http import JsonResponse
 from .models import Productos, Costos
-from vercel_app.settings import COSTO_TOTAL_FABRICA, TOTAL_HORAS_FABRICA_MENSUAL
+from vercel_app import settings
+from .personal import calcular_liquidacion
 import json
 from functools import lru_cache
 
@@ -38,12 +39,16 @@ def get_cost_by_product(request, producto_id):
     precio_sugerido = round(sum_cost / lote_produccion * ((utilidad / 100) + 1), 2)
     costo_unitario_mp = round(sum_cost / lote_produccion, 2)
     margen_utilidad = round(((precio_actual / sum_cost * lote_produccion) - 1) * 100, 2)
-    lotes_mensuales = int(TOTAL_HORAS_FABRICA_MENSUAL / prod.tiempo_produccion)
+    lotes_mensuales = int(settings.TOTAL_HORAS_FABRICA_MENSUAL / prod.tiempo_produccion)
     venta_estimada_mensual = round(lote_produccion * lotes_mensuales * precio_actual, 2)
     costo_estimado_mensual = round(lote_produccion * lotes_mensuales * costo_unitario_mp, 2)
     prod_utilidad_mensual = round(venta_estimada_mensual - costo_estimado_mensual, 2)
-    total_utilidad_mensual = round(prod_utilidad_mensual - COSTO_TOTAL_FABRICA, 2)
-    utilidad_mensual = round(((venta_estimada_mensual / (costo_estimado_mensual + COSTO_TOTAL_FABRICA)) - 1) * 100, 2)
+    total_utilidad_mensual = round(prod_utilidad_mensual - settings.COSTO_TOTAL_FABRICA, 2)
+    utilidad_mensual = round(((venta_estimada_mensual / (costo_estimado_mensual + settings.COSTO_TOTAL_FABRICA)) - 1) * 100, 2)
+
+    liquidacion = calcular_liquidacion(sueldo_bruto=settings.SUELDO_BRUTO, descuento_sindical=0, alicuota_art=settings.ALICUOTA_ART)
+    costo_mo = prod.tiempo_produccion * liquidacion.get("costo_hora")
+    costo_fab = prod.tiempo_produccion * (settings.COSTO_FABRICA / (settings.TOTAL_HORAS_FABRICA_MENSUAL))
 
     response = {
         "producto_nombre": prod.nombre,
@@ -53,7 +58,11 @@ def get_cost_by_product(request, producto_id):
         "precio_actual": precio_actual,
         "precio_sugerido": round(precio_sugerido, 2),
         "costo_unitario_mp": costo_unitario_mp,
+        "costo_unitario_mo": round(costo_mo / lote_produccion, 2),
+        "costo_unitario_fab": round(costo_fab / lote_produccion, 2),
         "costo_lote_mp": round(costo_unitario_mp * lote_produccion, 2),
+        "costo_lote_mo": round(costo_mo, 2),
+        "costo_lote_fab": round(costo_fab, 2),
         "venta_estimada_lote": round(precio_actual * lote_produccion, 2),
         "margen_utilidad": margen_utilidad,
         "utilidad_del_lote": round((precio_actual * lote_produccion) - (costo_unitario_mp * lote_produccion), 2),
@@ -86,7 +95,11 @@ def get_all_cost(request):
                 "precio_actual": prod_cost.get("precio_actual"),
                 "precio_sugerido": prod_cost.get("precio_sugerido"),
                 "costo_unitario_mp": prod_cost.get("costo_unitario_mp"),
+                "costo_unitario_mo": prod_cost.get("costo_unitario_mo"),
+                "costo_unitario_fab": prod_cost.get("costo_unitario_fab"),
                 "costo_lote_mp": prod_cost.get("costo_lote_mp"),
+                "costo_lote_mo": prod_cost.get("costo_lote_mo"),
+                "costo_lote_fab": prod_cost.get("costo_lote_fab"),
                 "venta_estimada_lote": prod_cost.get("venta_estimada_lote"),
                 "margen_utilidad": prod_cost.get("margen_utilidad"),
                 "utilidad_del_lote": prod_cost.get("utilidad_del_lote"),
@@ -835,8 +848,11 @@ def get_precio_productos(request):
                 ret = get_cost_by_product(request, prod.get("producto_id"))
                 prod_cost = json.loads(ret.content)
                 prod["costo_unitario_mp"] = prod_cost.get("costo_unitario_mp")
-                prod["costo_unitario_fab"] = round(COSTO_TOTAL_FABRICA / (prod_cost.get("lotes_mensuales") * prod_cost.get("lote_produccion")), 2)
+                prod["costo_unitario_mo"] = prod_cost.get("costo_unitario_mo")
+                prod["costo_unitario_fab_new"] = prod_cost.get("costo_unitario_fab")
+                prod["costo_unitario_fab"] = round(settings.COSTO_TOTAL_FABRICA / (prod_cost.get("lotes_mensuales") * prod_cost.get("lote_produccion")), 2)
                 prod["costo_total"] = prod["costo_unitario_mp"] + prod["costo_unitario_fab"]
+                prod["costo_total_new"] = prod["costo_unitario_mp"] + prod["costo_unitario_mo"] + prod["costo_unitario_fab_new"]
 
                 if prod["precio_va"] and prod["costo_total"] > 0:
                     prod["porcentaje_va"] = round(((prod["precio_va"] / prod["costo_total"]) - 1) * 100, 2)
@@ -876,7 +892,10 @@ def get_precio_productos(request):
             "precio_cp": 0,
             "costo_unitario_mp": 0,
             "costo_unitario_fab": 0,
+            "costo_unitario_mo": 0,
+            "costo_unitario_fab_new": 0,
             "costo_total": 0,
+            "costo_total_new": 0,
             "porcentaje_va": 0,
             "ganancia_va": 0,
             "porcentaje_cp": 0,
