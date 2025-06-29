@@ -842,7 +842,7 @@ def get_precio_productos(request):
         cursor.execute(sql)
         data = _dictfetchall(cursor)
 
-    for prod in data:
+    for prod in data[0:2]:
         try:
             if prod.get("producto_id"):
                 ret = get_cost_by_product(request, prod.get("producto_id"))
@@ -864,6 +864,7 @@ def get_precio_productos(request):
                     prod["precio_va"] = 0
                     prod["porcentaje_va"] = None
                     prod["ganancia_va"] = 0
+
                 if prod["precio_cp"] and prod["costo_total"] > 0:
                     prod["porcentaje_cp"] = round(((prod["precio_cp"] / prod["costo_total"]) - 1) * 100, 2)
                     prod["ganancia_cp"] = round(prod["precio_cp"] - prod["costo_total"], 2)
@@ -873,20 +874,26 @@ def get_precio_productos(request):
                     prod["precio_cp"] = 0
                     prod["porcentaje_cp"] = None
                     prod["ganancia_cp"] = 0
+
+                if prod["precio_sugerido"] and prod["costo_total"] > 0:
+                    prod["porcentaje_sugerido"] = round(((prod["precio_sugerido"] / prod["costo_total_new"]) - 1) * 100, 2)
+                    prod["ganancia_sugerido"] = round(prod["precio_sugerido"] - prod["costo_total_new"], 2)
+                    if not prod["ganancia_sugerido"]:
+                        prod["ganancia_sugerido"] = 0
+                else:
+                    prod["precio_sugerido"] = 0
+                    prod["porcentaje_sugerido"] = None
+                    prod["ganancia_sugerido"] = 0
+
                 if prod["ganancia_va"]:
                     prod["ganancia_fab"] = prod.get("plan", 0) * prod["ganancia_va"] * 0.8
                 else:
                     prod["ganancia_fab"] = 0
 
-                if prod["precio_sugerido"] and prod["costo_total"] > 0:
-                    prod["porcentaje"] = round(((prod["precio_sugerido"] / prod["costo_total_new"]) - 1) * 100, 2)
-                    prod["ganancia"] = round(prod["precio_sugerido"] - prod["costo_total_new"], 2)
-                    if not prod["ganancia"]:
-                        prod["ganancia"] = 0
+                if prod["ganancia_sugerido"]:
+                    prod["ganancia_fab_new"] = prod.get("plan", 0) * prod["ganancia_sugerido"] * 0.8
                 else:
-                    prod["precio_sugerido"] = 0
-                    prod["porcentaje"] = None
-                    prod["ganancia"] = 0
+                    prod["ganancia_fab_new"] = 0
 
             pass
         finally:
