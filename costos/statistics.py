@@ -858,7 +858,7 @@ def get_precio_productos(request):
                     prod["precio_sugerido"] = round(prod["costo_total_new"] / 0.70, 2)
                 else:
                     prod["precio_sugerido"] = 0.00
-                    
+
                 if prod["precio_va"] and prod["costo_total"] > 0:
                     prod["porcentaje_va"] = round(((prod["precio_va"] / prod["costo_total"]) - 1) * 100, 2)
                     prod["ganancia_va"] = round(prod["precio_va"] - prod["costo_total"], 2)
