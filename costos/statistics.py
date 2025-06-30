@@ -917,6 +917,7 @@ def get_precio_productos(request):
             "producto_name": "TOTALES",
             "precio_va": 0,
             "precio_cp": 0,
+            "precio_sugerido": 0,
             "costo_unitario_mp": 0,
             "costo_unitario_fab": 0,
             "costo_unitario_mo": 0,
