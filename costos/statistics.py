@@ -853,8 +853,8 @@ def get_precio_productos(request):
                 prod["costo_unitario_fab_new"] = prod_cost.get("costo_unitario_fab")
                 prod["costo_unitario_fab"] = round(settings.COSTO_TOTAL_FABRICA / (prod_cost.get("lotes_mensuales") * prod_cost.get("lote_produccion")), 2)
                 prod["costo_total"] = prod["costo_unitario_mp"] + prod["costo_unitario_fab"]
-                prod["costo_total_new"] = prod["costo_unitario_mp"] + prod["costo_unitario_mo"] + prod["costo_unitario_fab_new"]
-                prod["precio_sugerido"] = prod["costo_total_new"] / 0.70
+                prod["costo_total_new"] = round(prod["costo_unitario_mp"] + prod["costo_unitario_mo"] + prod["costo_unitario_fab_new"], 2)
+                prod["precio_sugerido"] = round(prod["costo_total_new"] / 0.70, 2)
 
                 if prod["precio_va"] and prod["costo_total"] > 0:
                     prod["porcentaje_va"] = round(((prod["precio_va"] / prod["costo_total"]) - 1) * 100, 2)
@@ -887,12 +887,12 @@ def get_precio_productos(request):
                     prod["ganancia_sugerido"] = 0
 
                 if prod["ganancia_va"]:
-                    prod["ganancia_fab"] = prod.get("plan", 0) * prod["ganancia_va"] * 0.8
+                    prod["ganancia_fab"] = round(prod.get("plan", 0) * prod["ganancia_va"] * 0.8, 2)
                 else:
                     prod["ganancia_fab"] = 0
 
                 if prod["ganancia_sugerido"]:
-                    prod["ganancia_fab_new"] = prod.get("plan", 0) * prod["ganancia_sugerido"] * 0.8
+                    prod["ganancia_fab_new"] = round(prod.get("plan", 0) * prod["ganancia_sugerido"] * 0.8, 2)
                 else:
                     prod["ganancia_fab_new"] = 0
 
