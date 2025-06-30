@@ -886,7 +886,7 @@ def get_precio_productos(request):
                         prod["ganancia_sugerido"] = 0
                 else:
                     prod["precio_sugerido"] = 0
-                    prod["porcentaje_sugerido"] = None
+                    prod["porcentaje_sugerido"] = 0
                     prod["ganancia_sugerido"] = 0
 
                 if prod["ganancia_va"]:
