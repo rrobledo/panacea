@@ -5,6 +5,7 @@ from vercel_app import settings
 from .personal import calcular_liquidacion
 import json
 from functools import lru_cache
+from datetime import datetime
 
 
 @lru_cache(10)
@@ -771,8 +772,9 @@ def get_planning(request):
 
 
 def get_precio_productos(request):
+    mes = int(request.GET.get("mes", datetime.now().month))
 
-    sql = """
+    sql = f"""
         with t as (
         select p.id as producto_id,
                p.prioridad as prioridad, 
@@ -817,7 +819,7 @@ def get_precio_productos(request):
                   from costos_planificacion pl
                  where pl.producto_id = p.id
                    and extract(year from pl.fecha) = extract(year from current_date)
-                   and extract(month from pl.fecha) = extract(month from current_date)), 0) as plan,
+                   and extract(month from pl.fecha) = {mes}), 0) as plan,
                 p.precio_actual
            from costos_productos p
           where p.habilitado = true 
