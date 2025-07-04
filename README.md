@@ -44,7 +44,7 @@ WSGI_APPLICATION = 'vercel_app.wsgi.app'
 There is a single view which renders the current time in `example/views.py`:
 
 ```python
-# example/views.py
+# example/views_old.py
 from datetime import datetime
 
 from django.http import HttpResponse

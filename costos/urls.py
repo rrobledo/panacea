@@ -1,6 +1,6 @@
 from django.urls import path, include
 from django.http import JsonResponse
-from . import views, statistics, views_new, apps, produccion, ventas
+from . import views_old, statistics, views, apps, produccion, ventas
 
 # Routers provide an easy way of automatically determining the URL conf.
 from rest_framework_nested.routers import SimpleRouter, NestedSimpleRouter
@@ -19,15 +19,16 @@ def get_categories(request):
 
 
 router = OptionalSlashRouter()
-router.register(r'insumos', views_new.InsumosViewSet)
-router.register(r'productos', views_new.ProductosViewSet)
-router.register(r'clientes', views_new.ClientesViewSet)
-router.register(r'remitos', views_new.RemitosViewSet)
-router.register(r'programacion', views_new.ProgramacionViewSet, basename="programacion")
-router.register(r'planning', views_new.PlanificacionViewSet, basename="planning")
+router.register(r'insumos', views.InsumosViewSet)
+router.register(r'productos', views.ProductosViewSet)
+router.register(r'clientes', views.ClientesViewSet)
+router.register(r'remitos', views.RemitosViewSet)
+router.register(r'programacion', views.ProgramacionViewSet, basename="programacion")
+router.register(r'planning', views.PlanificacionViewSet, basename="planning")
+router.register(r'proveedores', views.ProveedorViewSet)
 
 costos_router = NestedSimpleRouter(router, r'productos', lookup='producto')
-costos_router.register(r'costos', views_new.CostosViewSet, basename='costos')
+costos_router.register(r'costos', views.CostosViewSet, basename='costos')
 
 urlpatterns = [
     path('', include(router.urls)),
