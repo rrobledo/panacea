@@ -1,7 +1,7 @@
 from .models import Insumos, Productos, Costos, Programacion, Remitos, RemitoDetalles, Clientes, Proveedor, Factura
 from .serializers import (InsumosSerializer, ProductosSerializer, CostosSerializer,
                           ProgramacionSerializer, RemitosSerializer, RemitoDetallesSerializer, ClientesSerializer,
-                          ProveedorSerializer)
+                          ProveedorSerializer, FacturaSerializer)
 from rest_framework import viewsets
 from rest_framework import filters
 from rest_framework.response import Response
@@ -212,8 +212,8 @@ class ProveedorViewSet(viewsets.ModelViewSet):
 
 
 class FacturaViewSet(viewsets.ModelViewSet):
-    # queryset = Factura.objects.order_by("").all()
-    serializer_class = ProveedorSerializer
+    queryset = Factura.objects.all()
+    serializer_class = FacturaSerializer
 
     # def get_queryset(self):
     #     """
