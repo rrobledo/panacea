@@ -26,7 +26,7 @@ router.register(r'remitos', views.RemitosViewSet)
 router.register(r'programacion', views.ProgramacionViewSet, basename="programacion")
 router.register(r'planning', views.PlanificacionViewSet, basename="planning")
 router.register(r'proveedores', views.ProveedorViewSet)
-router.register(r'facturas', views.Facturas)
+router.register(r'facturas', views.FacturaViewSet)
 
 costos_router = NestedSimpleRouter(router, r'productos', lookup='producto')
 costos_router.register(r'costos', views.CostosViewSet, basename='costos')
