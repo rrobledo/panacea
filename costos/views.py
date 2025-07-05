@@ -1,4 +1,4 @@
-from .models import Insumos, Productos, Costos, Programacion, Remitos, RemitoDetalles, Clientes, Proveedor
+from .models import Insumos, Productos, Costos, Programacion, Remitos, RemitoDetalles, Clientes, Proveedor, Factura
 from .serializers import (InsumosSerializer, ProductosSerializer, CostosSerializer,
                           ProgramacionSerializer, RemitosSerializer, RemitoDetallesSerializer, ClientesSerializer,
                           ProveedorSerializer)
@@ -209,3 +209,22 @@ class ProveedorViewSet(viewsets.ModelViewSet):
         if estado is not None and estado != "ALL":
             queryset = queryset.filter(estado=estado)
         return queryset
+
+
+class FacturaViewSet(viewsets.ModelViewSet):
+    # queryset = Factura.objects.order_by("").all()
+    serializer_class = ProveedorSerializer
+
+    # def get_queryset(self):
+    #     """
+    #     Optionally restricts the returned purchases to a given cost,
+    #     by filtering against a `cost` query parameter in the URL.
+    #     """
+    #     queryset = Factura.objects.order_by("nombre").all()
+    #     nombre = self.request.query_params.get('nombre')
+    #     if nombre is not None:
+    #         queryset = queryset.filter(nombre__icontains=nombre)
+    #     estado = self.request.query_params.get('estado')
+    #     if estado is not None and estado != "ALL":
+    #         queryset = queryset.filter(estado=estado)
+    #     return queryset
