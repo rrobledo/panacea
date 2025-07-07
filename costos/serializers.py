@@ -176,8 +176,8 @@ class FacturaSerializer(serializers.ModelSerializer):
     class Meta:
         model = Factura
         fields = [
-            'id', 'proveedor', 'numero', 'fecha_emision', 
-            'fecha_vencimiento', 'importe_total', 'categoria', 
+            'id', 'proveedor', 'numero', 'fecha_emision',
+            'observaciones', 'fecha_vencimiento', 'importe_total', 'categoria',
             'tipo_pago', 'estado', 'pagos_aplicados'
         ]
     
