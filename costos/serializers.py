@@ -150,7 +150,7 @@ class ProveedorSerializer(serializers.ModelSerializer):
     class Meta:
         model = Proveedor
         fields = [
-            'id', 'nombre', 'cuit', 'direccion', 'telefono', 
+            "absolute_url", 'id', 'nombre', 'cuit', 'direccion', 'telefono',
             'email', 'fecha_alta', 'estado'
         ]
 
