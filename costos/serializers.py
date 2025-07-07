@@ -139,6 +139,13 @@ class PlanificacionSerializer(serializers.HyperlinkedModelSerializer):
 
 
 class ProveedorSerializer(serializers.ModelSerializer):
+    absolute_url = serializers.SerializerMethodField()
+
+    def get_absolute_url(self, obj):
+        request = self.context.get('request')
+        base_url = f"{request.scheme}://{request.get_host()}"
+        absolute_url = reverse('proveedor-detail', args=[str(obj.id)])
+        return f"{base_url}{absolute_url}"
 
     class Meta:
         model = Proveedor
