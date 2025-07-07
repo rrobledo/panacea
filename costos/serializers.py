@@ -144,7 +144,7 @@ class ProveedorSerializer(serializers.ModelSerializer):
         model = Proveedor
         fields = [
             'id', 'nombre', 'cuit', 'direccion', 'telefono', 
-            'email', 'fecha_alta', 'estado', 'facturas', 'pagos'
+            'email', 'fecha_alta', 'estado'
         ]
 
 class CuentaCorrienteProveedorSerializer(serializers.ModelSerializer):
