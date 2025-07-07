@@ -155,7 +155,7 @@ class CuentaCorrienteProveedorSerializer(serializers.ModelSerializer):
     class Meta:
         model = CuentaCorrienteProveedor
         fields = [
-            'id', 'proveedor', 'tipo_movimiento', 'numero', 'fecha_emision',
+            'id', "proveedor_id", "proveedor_nombre", 'proveedor', 'tipo_movimiento', 'numero', 'fecha_emision',
             'observaciones', 'fecha_vencimiento', 'importe_total', 'categoria',
             'estado'
         ]
