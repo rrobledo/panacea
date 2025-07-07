@@ -155,5 +155,5 @@ class CuentaCorrienteProveedorSerializer(serializers.ModelSerializer):
         fields = [
             'id', 'proveedor', 'tipo_movimiento', 'numero', 'fecha_emision',
             'observaciones', 'fecha_vencimiento', 'importe_total', 'categoria',
-            'tipo_pago', 'estado', 'pagos_aplicados'
+            'estado'
         ]
