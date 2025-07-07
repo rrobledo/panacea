@@ -1,5 +1,5 @@
 from .models import Insumos, Productos, Costos, Programacion, Planificacion2024, Clientes, Remitos, RemitoDetalles, \
-    Planificacion, Proveedor, Pago, Factura, CuentaCorrienteProveedor
+    Planificacion, Proveedor, CuentaCorrienteProveedor
 from rest_framework import serializers
 from django.urls import reverse
 
@@ -138,30 +138,8 @@ class PlanificacionSerializer(serializers.HyperlinkedModelSerializer):
         fields = ["id", "producto_nombre"]
 
 
-class PagoSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Pago
-        fields = [
-            'id', 'proveedor', 'fecha_pago', 'importe', 
-            'metodo_pago', 'referencia', 'observaciones'
-        ]
-        
-class FacturaNestedSerializer(serializers.ModelSerializer):
-    """Simplified Factura serializer for nested relationships"""
-    class Meta:
-        model = Factura
-        fields = ['id', 'numero', 'fecha_emision', 'importe_total', 'estado']
-
-class PagoNestedSerializer(serializers.ModelSerializer):
-    """Simplified Pago serializer for nested relationships"""
-    class Meta:
-        model = Pago
-        fields = ['id', 'fecha_pago', 'importe', 'metodo_pago']
-
 class ProveedorSerializer(serializers.ModelSerializer):
-    facturas = FacturaNestedSerializer(many=True, read_only=True)
-    pagos = PagoNestedSerializer(many=True, read_only=True)
-    
+
     class Meta:
         model = Proveedor
         fields = [
@@ -169,31 +147,13 @@ class ProveedorSerializer(serializers.ModelSerializer):
             'email', 'fecha_alta', 'estado', 'facturas', 'pagos'
         ]
 
-class FacturaSerializer(serializers.ModelSerializer):
+class CuentaCorrienteProveedorSerializer(serializers.ModelSerializer):
     proveedor = ProveedorSerializer(read_only=True)
-    pagos_aplicados = serializers.SerializerMethodField()
-    
+
     class Meta:
-        model = Factura
+        model = CuentaCorrienteProveedor
         fields = [
-            'id', 'proveedor', 'numero', 'fecha_emision',
+            'id', 'proveedor', 'tipo_movimiento', 'numero', 'fecha_emision',
             'observaciones', 'fecha_vencimiento', 'importe_total', 'categoria',
             'tipo_pago', 'estado', 'pagos_aplicados'
         ]
-    
-    def get_pagos_aplicados(self, obj):
-        pagos = CuentaCorrienteProveedor.objects.filter(factura=obj)
-        return [{
-            'pago_id': pago.pago.id,
-            'fecha_pago': pago.pago.fecha_pago,
-            'importe_aplicado': pago.importe_aplicado,
-            'metodo_pago': pago.pago.metodo_pago
-        } for pago in pagos]
-
-class CuentaCorrienteProveedorSerializer(serializers.ModelSerializer):
-    factura = FacturaNestedSerializer(read_only=True)
-    pago = PagoNestedSerializer(read_only=True)
-    
-    class Meta:
-        model = CuentaCorrienteProveedor
-        fields = ['id', 'factura', 'pago', 'importe_aplicado']

@@ -138,40 +138,14 @@ class Proveedor(models.Model):
     estado = models.CharField(max_length=10, choices=ESTADO_CHOICES, default="activo")
 
 
-class Factura(models.Model):
-    ESTADO_CHOICES = [
-        ("pendiente", "Pendiente"),
-        ("pagada", "Pagada"),
-        ("vencida", "Vencida"),
-    ]
-
+class CuentaCorrienteProveedor(models.Model):
     proveedor = models.ForeignKey(Proveedor, related_name="facturas", on_delete=models.RESTRICT, null=True)
+    tipo_movimiento = models.CharField(max_length=250, default='GASTO')
     numero = models.CharField(max_length=50)
     fecha_emision = models.DateField()
     fecha_vencimiento = models.DateField(blank=True, null=True)
     importe_total = models.DecimalField(max_digits=15, decimal_places=2)
     observaciones = models.CharField(max_length=250, null=True)
     categoria = models.CharField(max_length=250, default='MATERIA_PRIMA')
-    tipo_pago = models.CharField(max_length=250, default='CAJA')
     estado = models.CharField(max_length=250, default='PENDIENTE')
 
-
-class Pago(models.Model):
-    METODO_CHOICES = [
-        ("transferencia", "Transferencia"),
-        ("efectivo", "Efectivo"),
-        ("cheque", "Cheque"),
-    ]
-
-    proveedor = models.ForeignKey(Proveedor, related_name="pagos", on_delete=models.RESTRICT)
-    fecha_pago = models.DateField()
-    importe = models.DecimalField(max_digits=15, decimal_places=2)
-    metodo_pago = models.CharField(max_length=20, choices=METODO_CHOICES)
-    referencia = models.CharField(max_length=100, blank=True, null=True)
-    observaciones = models.TextField(blank=True, null=True)
-
-
-class CuentaCorrienteProveedor(models.Model):
-    factura = models.ForeignKey(Factura, related_name="pagos_aplicados", on_delete=models.RESTRICT)
-    pago = models.ForeignKey(Pago, related_name="facturas_aplicadas", on_delete=models.RESTRICT)
-    importe_aplicado = models.DecimalField(max_digits=15, decimal_places=2)
