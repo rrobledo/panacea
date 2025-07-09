@@ -139,7 +139,7 @@ class Proveedor(models.Model):
 
 
 class CuentaCorrienteProveedor(models.Model):
-    proveedor = models.ForeignKey(Proveedor, related_name="cuenta_corriente", on_delete=models.RESTRICT, null=True)
+    proveedor = models.ForeignKey(Proveedor, on_delete=models.RESTRICT, null=False)
     tipo_movimiento = models.CharField(max_length=250, default='GASTO')
     numero = models.CharField(max_length=50)
     fecha_emision = models.DateTimeField(auto_now=True)
@@ -147,5 +147,7 @@ class CuentaCorrienteProveedor(models.Model):
     importe_total = models.DecimalField(max_digits=15, decimal_places=2)
     observaciones = models.CharField(max_length=250, null=True)
     categoria = models.CharField(max_length=250, default='MATERIA_PRIMA')
+    tipo_pago = models.CharField(max_length=250, default='CUENTA_CORRIENTE')
+    caja = models.CharField(max_length=250, default='VA')
     estado = models.CharField(max_length=250, default='PENDIENTE')
 

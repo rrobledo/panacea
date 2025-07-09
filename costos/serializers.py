@@ -102,7 +102,6 @@ class RemitosSerializer(serializers.HyperlinkedModelSerializer):
         productos = RemitoDetalles.objects.filter(remito_id=remito.id)
         productos_data = validated_data.pop('productos')
         diff = productos - productos_data
-
         return  remito
 
 class ProgramacionSerializer(serializers.HyperlinkedModelSerializer):
@@ -144,7 +143,7 @@ class ProveedorSerializer(serializers.ModelSerializer):
     def get_absolute_url(self, obj):
         request = self.context.get('request')
         base_url = f"{request.scheme}://{request.get_host()}"
-        absolute_url = reverse('proveedor-detail', args=[str(obj.id)])
+        absolute_url = reverse('proveedores-detail', args=[str(obj.id)])
         return f"{base_url}{absolute_url}"
 
     class Meta:
@@ -155,7 +154,6 @@ class ProveedorSerializer(serializers.ModelSerializer):
         ]
 
 class CuentaCorrienteProveedorSerializer(serializers.ModelSerializer):
-    proveedor = ProveedorSerializer(read_only=True)
     proveedor_id = serializers.CharField(source='proveedor.id', required=False, read_only=True)
     proveedor_nombre = serializers.CharField(source='proveedor.nombre', required=False, read_only=True)
 
@@ -164,5 +162,11 @@ class CuentaCorrienteProveedorSerializer(serializers.ModelSerializer):
         fields = [
             'id', "proveedor_id", "proveedor_nombre", 'proveedor', 'tipo_movimiento', 'numero', 'fecha_emision',
             'observaciones', 'fecha_vencimiento', 'importe_total', 'categoria',
-            'estado'
+            'estado', 'caja', 'tipo_pago'
         ]
+
+    def create(self, validated_data):
+        if validated_data.get('tipo_pago') == 'EFECTIVO' or validated_data.get('tipo_pago') == 'TRANSFERENCIA':
+            validated_data["estado"] = "PAGADO"
+        comprobante = CuentaCorrienteProveedor.objects.create(**validated_data)
+        return comprobante

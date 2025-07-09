@@ -95,33 +95,6 @@ class RemitosViewSet(viewsets.ModelViewSet):
         return queryset
 
 
-# class ProgramacionViewSet(viewsets.ModelViewSet):
-#     serializer_class = ProgramacionSerializer
-#
-#     def get_queryset(self):
-#         """
-#         Optionally restricts the returned purchases to a given cost,
-#         by filtering against a `cost` query parameter in the URL.
-#         """
-#         queryset = Programacion.objects.order_by("producto__nombre").all()
-#         responsable = self.request.query_params.get('responsable')
-#         if responsable is not None:
-#             if responsable != "Todos":
-#                 queryset = queryset.filter(responsable=responsable)
-#         return queryset
-#
-#     def partial_update(self, request, pk=None):
-#         if isinstance(request.data, list):
-#             for item in request.data:
-#                 instance = Programacion.objects.get(id=item.get("id"))
-#                 serializer = self.get_serializer(instance, data=item, partial=True)
-#                 serializer.is_valid(raise_exception=True)
-#                 self.perform_update(serializer)
-#         else:
-#             return super().partial_update(request.data, pk=pk)
-#         return Response(status=status.HTTP_200_OK)
-
-
 class ProgramacionViewSet(viewsets.ViewSet):
         """
         Example empty viewset demonstrating the standard
@@ -213,7 +186,7 @@ class ProveedorViewSet(viewsets.ModelViewSet):
 
 
 class CuentaCorrienteProveedorViewSet(viewsets.ModelViewSet):
-    queryset = CuentaCorrienteProveedor.objects.all()
+    queryset = CuentaCorrienteProveedor.objects.order_by("fecha_emision").all()
     serializer_class = CuentaCorrienteProveedorSerializer
 
     # def get_queryset(self):
