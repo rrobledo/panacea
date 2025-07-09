@@ -144,7 +144,7 @@ class CuentaCorrienteProveedor(models.Model):
     numero = models.CharField(max_length=50)
     fecha_emision = models.DateField()
     fecha_vencimiento = models.DateField(blank=True, null=True)
-    importe_total = models.DecimalField(max_digits=15, decimal_places=2)
+    importe_total = models.FloatField()
     observaciones = models.CharField(max_length=250, null=True)
     categoria = models.CharField(max_length=250, default='MATERIA_PRIMA')
     tipo_pago = models.CharField(max_length=250, default='CUENTA_CORRIENTE')
