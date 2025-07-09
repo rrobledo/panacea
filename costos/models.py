@@ -150,4 +150,5 @@ class CuentaCorrienteProveedor(models.Model):
     tipo_pago = models.CharField(max_length=250, default='CUENTA_CORRIENTE')
     caja = models.CharField(max_length=250, default='VA')
     estado = models.CharField(max_length=250, default='PENDIENTE')
-
+    image = models.TextField(null=True)
+    content_type = models.CharField(max_length=100, null=True)

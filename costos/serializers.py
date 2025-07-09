@@ -2,7 +2,7 @@ from .models import Insumos, Productos, Costos, Programacion, Planificacion2024,
     Planificacion, Proveedor, CuentaCorrienteProveedor
 from rest_framework import serializers
 from django.urls import reverse
-
+import base64
 
 # Serializers define the API representation.
 class InsumosSerializer(serializers.HyperlinkedModelSerializer):
@@ -162,7 +162,7 @@ class CuentaCorrienteProveedorSerializer(serializers.ModelSerializer):
         fields = [
             'id', "proveedor_id", "proveedor_nombre", 'proveedor', 'tipo_movimiento', 'numero', 'fecha_emision',
             'observaciones', 'fecha_vencimiento', 'importe_total', 'categoria',
-            'estado', 'caja', 'tipo_pago'
+            'estado', 'caja', 'tipo_pago', 'image'
         ]
 
     def create(self, validated_data):
@@ -176,3 +176,16 @@ class CuentaCorrienteProveedorSerializer(serializers.ModelSerializer):
             validated_data["estado"] = "PAGADO"
         instance = super().update(comprobante, validated_data)
         return  instance
+
+class CuentaCorrienteProveedorReadSerializer(serializers.ModelSerializer):
+    proveedor_id = serializers.CharField(source='proveedor.id', required=False, read_only=True)
+    proveedor_nombre = serializers.CharField(source='proveedor.nombre', required=False, read_only=True)
+
+    class Meta:
+        model = CuentaCorrienteProveedor
+        fields = [
+            'id', "proveedor_id", "proveedor_nombre", 'proveedor', 'tipo_movimiento', 'numero', 'fecha_emision',
+            'observaciones', 'fecha_vencimiento', 'importe_total', 'categoria',
+            'estado', 'caja', 'tipo_pago'
+        ]
+

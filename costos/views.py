@@ -2,7 +2,8 @@ from .models import Insumos, Productos, Costos, Programacion, Remitos, RemitoDet
     CuentaCorrienteProveedor
 from .serializers import (InsumosSerializer, ProductosSerializer, CostosSerializer,
                           ProgramacionSerializer, RemitosSerializer, RemitoDetallesSerializer, ClientesSerializer,
-                          ProveedorSerializer, CuentaCorrienteProveedorSerializer)
+                          ProveedorSerializer, CuentaCorrienteProveedorSerializer,
+                          CuentaCorrienteProveedorReadSerializer)
 from rest_framework import viewsets
 from rest_framework import filters
 from rest_framework.response import Response
@@ -11,7 +12,7 @@ from django.db.models import Q
 from django.db import transaction, IntegrityError
 from . import produccion
 from django.http import JsonResponse, HttpResponse
-
+from rest_framework.parsers import MultiPartParser, FormParser
 
 # ViewSets define the view behavior.
 class InsumosViewSet(viewsets.ModelViewSet):
@@ -189,21 +190,19 @@ class CuentaCorrienteProveedorViewSet(viewsets.ModelViewSet):
     queryset = CuentaCorrienteProveedor.objects.filter(tipo_movimiento="FACTURA").order_by("fecha_emision").all()
     serializer_class = CuentaCorrienteProveedorSerializer
 
-    # def get_queryset(self):
-    #     """
-    #     Optionally restricts the returned purchases to a given cost,
-    #     by filtering against a `cost` query parameter in the URL.
-    #     """
-    #     queryset = Factura.objects.order_by("nombre").all()
-    #     nombre = self.request.query_params.get('nombre')
-    #     if nombre is not None:
-    #         queryset = queryset.filter(nombre__icontains=nombre)
-    #     estado = self.request.query_params.get('estado')
-    #     if estado is not None and estado != "ALL":
-    #         queryset = queryset.filter(estado=estado)
-    #     return queryset
-
+    def get_serializer_class(self):
+        if self.action in ['list']:
+            return CuentaCorrienteProveedorReadSerializer
+        return CuentaCorrienteProveedorSerializer
 
 class CuentaCorrienteProveedorPagosViewSet(viewsets.ModelViewSet):
     queryset = CuentaCorrienteProveedor.objects.filter(tipo_movimiento="PAGOS").order_by("fecha_emision").all()
     serializer_class = CuentaCorrienteProveedorSerializer
+
+    def get_queryset(self):
+        """
+        Optionally restricts the returned purchases to a given cost,
+        by filtering against a `cost` query parameter in the URL.
+        """
+        queryset = CuentaCorrienteProveedor.objects.filter(tipo_movimiento="PAGOS").order_by("fecha_emision").all()
+        return queryset
