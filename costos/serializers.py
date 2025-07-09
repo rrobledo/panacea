@@ -170,3 +170,9 @@ class CuentaCorrienteProveedorSerializer(serializers.ModelSerializer):
             validated_data["estado"] = "PAGADO"
         comprobante = CuentaCorrienteProveedor.objects.create(**validated_data)
         return comprobante
+
+    def update(self, comprobante, validated_data):
+        if validated_data.get('tipo_pago') == 'EFECTIVO' or validated_data.get('tipo_pago') == 'TRANSFERENCIA':
+            validated_data["estado"] = "PAGADO"
+        instance = super().update(comprobante, validated_data)
+        return  instance
