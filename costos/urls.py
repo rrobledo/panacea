@@ -27,10 +27,12 @@ router.register(r'programacion', views.ProgramacionViewSet, basename="programaci
 router.register(r'planning', views.PlanificacionViewSet, basename="planning")
 router.register(r'proveedores', views.ProveedorViewSet, basename="proveedores")
 router.register(r'ctacteprov', views.CuentaCorrienteProveedorViewSet)
-router.register(r'ctacteprovpagos', views.CuentaCorrienteProveedorPagosViewSet, basename="ctacteprovpagos")
 
 costos_router = NestedSimpleRouter(router, r'productos', lookup='producto')
 costos_router.register(r'costos', views.CostosViewSet, basename='costos')
+
+pagos_router = NestedSimpleRouter(router, r'ctacteprov', lookup='ctacteprov')
+pagos_router.register(r'pagos', views.CuentaCorrienteProveedorPagosViewSet, basename='pagos')
 
 urlpatterns = [
     path('', include(router.urls)),
