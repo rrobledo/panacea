@@ -140,7 +140,7 @@ class Proveedor(models.Model):
 
 class CuentaCorrienteProveedor(models.Model):
     proveedor = models.ForeignKey(Proveedor, on_delete=models.RESTRICT, null=False)
-    tipo_movimiento = models.CharField(max_length=250, default='GASTO')
+    tipo_movimiento = models.CharField(max_length=250, default='FACTURA')
     numero = models.CharField(max_length=50)
     fecha_emision = models.DateField()
     fecha_vencimiento = models.DateField(blank=True, null=True)
