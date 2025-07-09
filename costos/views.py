@@ -202,3 +202,8 @@ class CuentaCorrienteProveedorViewSet(viewsets.ModelViewSet):
     #     if estado is not None and estado != "ALL":
     #         queryset = queryset.filter(estado=estado)
     #     return queryset
+
+
+class CuentaCorrienteProveedorPagosViewSet(viewsets.ModelViewSet):
+    queryset = CuentaCorrienteProveedor.objects.filter(tipo_movimiento="PAGOS").order_by("fecha_emision").all()
+    serializer_class = CuentaCorrienteProveedorSerializer
