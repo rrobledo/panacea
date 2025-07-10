@@ -152,3 +152,9 @@ class CuentaCorrienteProveedor(models.Model):
     estado = models.CharField(max_length=250, default='PENDIENTE')
     image = models.TextField(null=True)
     content_type = models.CharField(max_length=100, null=True)
+
+
+class CuentaCorrienteProveedorAfect(models.Model):
+    factura = models.ForeignKey(CuentaCorrienteProveedor, on_delete=models.CASCADE, related_name='factura')
+    pago = models.ForeignKey(CuentaCorrienteProveedor, on_delete=models.CASCADE, related_name='pago')
+    importe = models.FloatField()

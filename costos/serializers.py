@@ -1,5 +1,5 @@
 from .models import Insumos, Productos, Costos, Programacion, Planificacion2024, Clientes, Remitos, RemitoDetalles, \
-    Planificacion, Proveedor, CuentaCorrienteProveedor
+    Planificacion, Proveedor, CuentaCorrienteProveedor, CuentaCorrienteProveedorAfect
 from rest_framework import serializers
 from django.urls import reverse
 import base64
@@ -156,19 +156,28 @@ class ProveedorSerializer(serializers.ModelSerializer):
 class CuentaCorrienteProveedorSerializer(serializers.ModelSerializer):
     proveedor_id = serializers.CharField(source='proveedor.id', required=False, read_only=True)
     proveedor_nombre = serializers.CharField(source='proveedor.nombre', required=False, read_only=True)
+    factura_id = serializers.CharField(write_only=True)
 
     class Meta:
         model = CuentaCorrienteProveedor
         fields = [
             'id', "proveedor_id", "proveedor_nombre", 'proveedor', 'tipo_movimiento', 'numero', 'fecha_emision',
             'observaciones', 'fecha_vencimiento', 'importe_total', 'categoria',
-            'estado', 'caja', 'tipo_pago', 'image'
+            'estado', 'caja', 'tipo_pago', 'image', 'factura_id'
         ]
 
     def create(self, validated_data):
-        if validated_data.get('tipo_pago') == 'EFECTIVO' or validated_data.get('tipo_pago') == 'TRANSFERENCIA':
-            validated_data["estado"] = "PAGADO"
-        comprobante = CuentaCorrienteProveedor.objects.create(**validated_data)
+        if validated_data.get('tipo_movimiento') == 'PAGO':
+            factura_id = validated_data.pop("factura_id", None)
+            if factura_id:
+                comprobante = CuentaCorrienteProveedor.objects.create(**validated_data)
+                CuentaCorrienteProveedorAfect.objects.create(factura_id=factura_id,
+                                                             pago_id=comprobante.id,
+                                                             importe=comprobante.importe_total)
+        else:
+            if validated_data.get('tipo_pago') == 'EFECTIVO' or validated_data.get('tipo_pago') == 'TRANSFERENCIA':
+                validated_data["estado"] = "PAGADO"
+            comprobante = CuentaCorrienteProveedor.objects.create(**validated_data)
         return comprobante
 
     def update(self, comprobante, validated_data):

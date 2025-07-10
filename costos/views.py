@@ -1,5 +1,5 @@
 from .models import Insumos, Productos, Costos, Programacion, Remitos, RemitoDetalles, Clientes, Proveedor, \
-    CuentaCorrienteProveedor
+    CuentaCorrienteProveedor, CuentaCorrienteProveedorAfect
 from .serializers import (InsumosSerializer, ProductosSerializer, CostosSerializer,
                           ProgramacionSerializer, RemitosSerializer, RemitoDetallesSerializer, ClientesSerializer,
                           ProveedorSerializer, CuentaCorrienteProveedorSerializer,
@@ -8,7 +8,7 @@ from rest_framework import viewsets
 from rest_framework import filters
 from rest_framework.response import Response
 from rest_framework import status
-from django.db.models import Q
+from django.db.models import Q, OuterRef, Exists
 from django.db import transaction, IntegrityError
 from . import produccion
 from django.http import JsonResponse, HttpResponse
@@ -196,13 +196,28 @@ class CuentaCorrienteProveedorViewSet(viewsets.ModelViewSet):
         return CuentaCorrienteProveedorSerializer
 
 class CuentaCorrienteProveedorPagosViewSet(viewsets.ModelViewSet):
-    queryset = CuentaCorrienteProveedor.objects.filter(tipo_movimiento="PAGOS").order_by("fecha_emision").all()
+    queryset = CuentaCorrienteProveedor.objects.filter(tipo_movimiento="PAGO").order_by("fecha_emision").all()
     serializer_class = CuentaCorrienteProveedorSerializer
+
+    def get_serializer_class(self):
+        if self.action in ['list']:
+            return CuentaCorrienteProveedorReadSerializer
+        return CuentaCorrienteProveedorSerializer
 
     def get_queryset(self):
         """
         Optionally restricts the returned purchases to a given cost,
         by filtering against a `cost` query parameter in the URL.
         """
-        queryset = CuentaCorrienteProveedor.objects.filter(tipo_movimiento="PAGOS").order_by("fecha_emision").all()
+        factura_id = self.kwargs['factura_pk']
+        afect = CuentaCorrienteProveedorAfect.objects.filter(
+            pago=OuterRef('pk'),
+            factura=factura_id
+        )
+
+        queryset = CuentaCorrienteProveedor.objects.annotate(
+            has_facturas=Exists(afect)
+        ).filter(
+            has_facturas=True
+        )
         return queryset

@@ -26,17 +26,18 @@ router.register(r'remitos', views.RemitosViewSet)
 router.register(r'programacion', views.ProgramacionViewSet, basename="programacion")
 router.register(r'planning', views.PlanificacionViewSet, basename="planning")
 router.register(r'proveedores', views.ProveedorViewSet, basename="proveedores")
-router.register(r'ctacteprov', views.CuentaCorrienteProveedorViewSet)
+router.register(r'ctacteprov', views.CuentaCorrienteProveedorViewSet, basename="ctacteprov")
 
 costos_router = NestedSimpleRouter(router, r'productos', lookup='producto')
 costos_router.register(r'costos', views.CostosViewSet, basename='costos')
 
-pagos_router = NestedSimpleRouter(router, r'ctacteprov', lookup='ctacteprov')
+pagos_router = NestedSimpleRouter(router, r'ctacteprov', lookup='factura')
 pagos_router.register(r'pagos', views.CuentaCorrienteProveedorPagosViewSet, basename='pagos')
 
 urlpatterns = [
     path('', include(router.urls)),
     path('', include(costos_router.urls)),
+    path('', include(pagos_router.urls)),
     path('costos_materia_prima', statistics.get_all_cost, name='get_all_cost', ),
     path('costos_materia_prima/<str:producto_id>', statistics.get_cost_by_product, name='get_cost_by_product'),
     path('products/<str:product_code>/history', statistics.get_product_history, name='get_product_history'),
