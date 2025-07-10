@@ -156,7 +156,7 @@ class ProveedorSerializer(serializers.ModelSerializer):
 class CuentaCorrienteProveedorSerializer(serializers.ModelSerializer):
     proveedor_id = serializers.CharField(source='proveedor.id', required=False, read_only=True)
     proveedor_nombre = serializers.CharField(source='proveedor.nombre', required=False, read_only=True)
-    factura_id = serializers.CharField(write_only=True)
+    factura_id = serializers.CharField(write_only=True, required=False, allow_null=True)
 
     class Meta:
         model = CuentaCorrienteProveedor
