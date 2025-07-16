@@ -68,6 +68,9 @@ class Remitos(models.Model):
     fecha_recibido = models.DateTimeField(null=True)
     fecha_facturacion = models.DateTimeField(null=True)
 
+    class Meta:
+        managed = False
+
 
 class RemitoDetalles(models.Model):
     id = models.AutoField(primary_key=True)
@@ -120,8 +123,9 @@ class Planificacion2024(models.Model):
     dec2024 = models.IntegerField(default=0)
 
     class Meta:
-        db_table = "planificacion2024"
         managed = False
+        db_table = "planificacion2024"
+
 
 class Proveedor(models.Model):
     ESTADO_CHOICES = [
@@ -151,6 +155,7 @@ class CuentaCorrienteProveedor(models.Model):
     caja = models.CharField(max_length=250, default='VA')
     estado = models.CharField(max_length=250, default='PENDIENTE')
     image = models.TextField(null=True)
+    image2 = models.TextField(null=True)
     content_type = models.CharField(max_length=100, null=True)
 
 

@@ -163,7 +163,7 @@ class CuentaCorrienteProveedorSerializer(serializers.ModelSerializer):
         fields = [
             'id', "proveedor_id", "proveedor_nombre", 'proveedor', 'tipo_movimiento', 'numero', 'fecha_emision',
             'observaciones', 'fecha_vencimiento', 'importe_total', 'categoria',
-            'estado', 'caja', 'tipo_pago', 'image', 'factura_id'
+            'estado', 'caja', 'tipo_pago', 'image', 'image2', 'factura_id'
         ]
 
     def create(self, validated_data):
