@@ -163,20 +163,30 @@ class CuentaCorrienteProveedorSerializer(serializers.ModelSerializer):
         fields = [
             'id', "proveedor_id", "proveedor_nombre", 'proveedor', 'tipo_movimiento', 'numero', 'fecha_emision',
             'observaciones', 'fecha_vencimiento', 'importe_total', 'categoria',
-            'estado', 'caja', 'tipo_pago', 'image', 'image2', 'factura_id'
+            'estado', 'caja', 'tipo_pago', 'image', 'image2', 'factura_id', 'importe_pendiente'
         ]
 
     def create(self, validated_data):
         if validated_data.get('tipo_movimiento') == 'PAGO':
             factura_id = validated_data.pop("factura_id", None)
             if factura_id:
+                validated_data["importe_pendiente"] = 0
                 comprobante = CuentaCorrienteProveedor.objects.create(**validated_data)
                 CuentaCorrienteProveedorAfect.objects.create(factura_id=factura_id,
                                                              pago_id=comprobante.id,
                                                              importe=comprobante.importe_total)
+                factura = CuentaCorrienteProveedor.objects.get(id=factura_id)
+                factura.importe_pendiente = factura.importe_pendiente - comprobante.importe_total
+                if factura.importe_pendiente <= 0:
+                    factura.estado = "PAGADO"
+                factura.save()
+
         else:
             if validated_data.get('tipo_pago') == 'EFECTIVO' or validated_data.get('tipo_pago') == 'TRANSFERENCIA':
                 validated_data["estado"] = "PAGADO"
+                validated_data["importe_pendiente"] = 0
+            else:
+                validated_data["importe_pendiente"] = validated_data["importe_total"]
             comprobante = CuentaCorrienteProveedor.objects.create(**validated_data)
         return comprobante
 
