@@ -14,7 +14,7 @@ def get_cuenta_corriente_prov_resumen(request):
           from costos_cuentacorrienteproveedor cc 
          where tipo_movimiento = 'FACTURA'
            and tipo_pago = 'CUENTA_CORRIENTE'
-           and fecha_emision between '{fecha_desde}' and '{fecha_hasta}' 
+           -- and fecha_emision between '{fecha_desde}' and '{fecha_hasta}' 
         ),
     t_total_gastos as (
         select round(sum(importe_total)::numeric, 2) as total_gastos
