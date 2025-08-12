@@ -213,6 +213,34 @@ class CuentaCorrienteProveedorViewSet(viewsets.ModelViewSet):
 
         return queryset
 
+class CuentaCorrienteProveedorResumenViewSet(viewsets.ModelViewSet):
+    queryset = CuentaCorrienteProveedor.objects.filter(tipo_movimiento="FACTURA").order_by("fecha_emision").all()
+    serializer_class = CuentaCorrienteProveedorSerializer
+
+    def get_serializer_class(self):
+        if self.action in ['list']:
+            return CuentaCorrienteProveedorReadSerializer
+        return CuentaCorrienteProveedorSerializer
+
+    def get_queryset(self):
+        """
+        Optionally restricts the returned purchases to a given cost,
+        by filtering against a `cost` query parameter in the URL.
+        """
+        queryset = CuentaCorrienteProveedor.objects.order_by("fecha_emision").all()
+        fecha_desde = self.request.query_params.get('fecha_desde')
+        if fecha_desde is not None:
+            queryset = queryset.filter(fecha_emision__gte=fecha_desde)
+        fecha_hasta = self.request.query_params.get('fecha_hasta')
+        if fecha_hasta is not None:
+            queryset = queryset.filter(fecha_emision__lte=fecha_hasta)
+        estado = self.request.query_params.get('estado')
+        if estado is not None and estado != "TODOS":
+            queryset = queryset.filter(estado=estado)
+
+        return queryset
+
+
 
 class CuentaCorrienteProveedorPagosViewSet(viewsets.ModelViewSet):
     queryset = CuentaCorrienteProveedor.objects.filter(tipo_movimiento="PAGO").order_by("fecha_emision").all()
