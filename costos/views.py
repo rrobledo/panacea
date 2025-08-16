@@ -200,7 +200,7 @@ class CuentaCorrienteProveedorViewSet(viewsets.ModelViewSet):
         Optionally restricts the returned purchases to a given cost,
         by filtering against a `cost` query parameter in the URL.
         """
-        queryset = CuentaCorrienteProveedor.filter(tipo_movimiento="FACTURA").objects.order_by("fecha_emision").all()
+        queryset = CuentaCorrienteProveedor.objects.filter(tipo_movimiento="FACTURA").order_by("fecha_emision").all()
         fecha_desde = self.request.query_params.get('fecha_desde')
         if fecha_desde is not None:
             queryset = queryset.filter(fecha_emision__gte=fecha_desde)
