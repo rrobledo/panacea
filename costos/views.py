@@ -187,7 +187,7 @@ class ProveedorViewSet(viewsets.ModelViewSet):
 
 
 class CuentaCorrienteProveedorViewSet(viewsets.ModelViewSet):
-    queryset = CuentaCorrienteProveedor.objects.filter(tipo_movimiento="FACTURA").order_by("fecha_emision").all()
+    queryset = CuentaCorrienteProveedor.objects.order_by("fecha_emision").all()
     serializer_class = CuentaCorrienteProveedorSerializer
 
     def get_serializer_class(self):
@@ -200,7 +200,7 @@ class CuentaCorrienteProveedorViewSet(viewsets.ModelViewSet):
         Optionally restricts the returned purchases to a given cost,
         by filtering against a `cost` query parameter in the URL.
         """
-        queryset = CuentaCorrienteProveedor.objects.filter(tipo_movimiento="FACTURA").order_by("fecha_emision").all()
+        queryset = CuentaCorrienteProveedor.objects.order_by("fecha_emision").all()
         fecha_desde = self.request.query_params.get('fecha_desde')
         if fecha_desde is not None:
             queryset = queryset.filter(fecha_emision__gte=fecha_desde)
