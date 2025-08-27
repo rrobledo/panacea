@@ -214,7 +214,7 @@ class CuentaCorrienteProveedorViewSet(viewsets.ModelViewSet):
         return queryset
 
 class CuentaCorrienteProveedorResumenViewSet(viewsets.ModelViewSet):
-    queryset = CuentaCorrienteProveedor.objects.filter(tipo_movimiento="FACTURA").order_by("fecha_emision").all()
+    queryset = CuentaCorrienteProveedor.objects.order_by("fecha_emision").all()
     serializer_class = CuentaCorrienteProveedorSerializer
 
     def get_serializer_class(self):
