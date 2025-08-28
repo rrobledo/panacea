@@ -10,7 +10,7 @@ def get_cuenta_corriente_prov_resumen(request):
 
     sql = f"""
     with t_total_facturas_pendientes as (
-        select round(sum(importe_total)::numeric, 2) as total_facturas_pendientes
+        select round(sum(importe_pendiente)::numeric, 2) as total_facturas_pendientes
           from costos_cuentacorrienteproveedor cc 
          where tipo_movimiento = 'FACTURA'
            and tipo_pago = 'CUENTA_CORRIENTE'
