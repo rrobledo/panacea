@@ -170,17 +170,11 @@ class CuentaCorrienteProveedorSerializer(serializers.ModelSerializer):
         if validated_data.get('tipo_movimiento') == 'PAGO':
             factura_id = validated_data.pop("factura_id", None)
             if factura_id:
-                validated_data["importe_pendiente"] = 0
+                validated_data["importe_pendiente"] = validated_data["importe_total"]
                 comprobante = CuentaCorrienteProveedor.objects.create(**validated_data)
                 CuentaCorrienteProveedorAfect.objects.create(factura_id=factura_id,
                                                              pago_id=comprobante.id,
                                                              importe=comprobante.importe_total)
-                factura = CuentaCorrienteProveedor.objects.get(id=factura_id)
-                factura.importe_pendiente = factura.importe_pendiente - comprobante.importe_total
-                if factura.importe_pendiente <= 0:
-                    factura.estado = "PAGADO"
-                factura.save()
-
         else:
             if validated_data.get('tipo_pago') == 'EFECTIVO' or validated_data.get('tipo_pago') == 'TRANSFERENCIA':
                 validated_data["estado"] = "PAGADO"
@@ -195,6 +189,7 @@ class CuentaCorrienteProveedorSerializer(serializers.ModelSerializer):
             validated_data["estado"] = "PAGADO"
         instance = super().update(comprobante, validated_data)
         return  instance
+
 
 class CuentaCorrienteProveedorReadSerializer(serializers.ModelSerializer):
     proveedor_id = serializers.CharField(source='proveedor.id', required=False, read_only=True)
