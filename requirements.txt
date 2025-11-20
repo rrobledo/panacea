@@ -8,3 +8,4 @@ drf-yasg==1.21.6
 psycopg2-binary==2.9.9
 drf-nested-routers==0.94.1
 djangorestframework~=3.15.2
+setuptools
