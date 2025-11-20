@@ -1,0 +1,6 @@
+{
+  "name": "python-vercel-runtime",
+  "engines": {
+    "node": "22.x"
+  }
+}
