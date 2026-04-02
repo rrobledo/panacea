@@ -901,6 +901,11 @@ def get_precio_productos(request):
                 else:
                     prod["ganancia_fab_new"] = 0
 
+                if prod["precio_sugerido"]  > 0:
+                    prod["precio_sugerido_final"] = round(prod["precio_sugerido"] / 0.60, 2)
+                else:
+                    prod["precio_sugerido_final"] = 0.00
+
             pass
         finally:
             pass
@@ -920,6 +925,7 @@ def get_precio_productos(request):
             "precio_va": 0,
             "precio_cp": 0,
             "precio_sugerido": 0,
+            "precio_sugerido_final": 0,
             "costo_unitario_mp": 0,
             "costo_unitario_fab": 0,
             "costo_unitario_mo": 0,
