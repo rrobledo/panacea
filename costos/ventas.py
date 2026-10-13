@@ -25,6 +25,7 @@ def get_ventas_por_cliente(request):
                 when customer_id = 999 then 'Panacea Carlos Paz'
                 when customer_id = 0 then 'Panacea Villa Allende'
                 when customer_id = 888 then 'Panacea Cordoba'
+                when customer_id = 777 then 'Panacea Villa General Belgrano'
                 else 'Dieteticas'
                end as cliente,
                sum(count) as cantidad, 
